@@ -81,7 +81,8 @@ WSGI_APPLICATION = 'isuku_app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# Database configuration - use PostgreSQL in production if DATABASE_URL is set
+# Database configuration
+# Prefer PostgreSQL if DATABASE_URL is set; otherwise use SQLite.
 import dj_database_url
 
 if 'DATABASE_URL' in os.environ:
@@ -93,10 +94,19 @@ if 'DATABASE_URL' in os.environ:
         )
     }
 else:
+    # Allow overriding the SQLite file location via DATABASE_FILE so it can live on a Render Disk
+    SQLITE_FILE = os.environ.get('DATABASE_FILE')
+    # Ensure parent directory exists when a custom path is provided
+    if SQLITE_FILE:
+        try:
+            os.makedirs(os.path.dirname(SQLITE_FILE), exist_ok=True)
+        except Exception:
+            # Best-effort; if it fails, sqlite will error and logs will show details
+            pass
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'NAME': SQLITE_FILE if SQLITE_FILE else BASE_DIR / 'db.sqlite3',
         }
     }
 
@@ -158,6 +168,37 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # WhiteNoise configuration for serving static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Security & proxy settings (Render)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Trusted origins for CSRF when running behind Render domains
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    'CSRF_TRUSTED_ORIGINS',
+    'https://*.onrender.com'
+).split(',')
+
+# Basic logging to surface errors in Render logs
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
 
 # Media files (for user uploads)
 MEDIA_URL = '/media/'

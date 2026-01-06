@@ -978,25 +978,37 @@
             chevron.style.transform = 'rotate(0deg)';
         }
         
-        // Check if TranslationManager exists
+        // Ensure TranslationManager exists; if not, load it dynamically then proceed
         if (!window.TranslationManager) {
-            console.error('❌ TranslationManager not found!');
-            alert('Translation system not loaded. Please refresh the page.');
+            console.warn('TranslationManager not found; loading script dynamically...');
+            const scriptUrl = "{{ static('js/translations.js') }}";
+            const s = document.createElement('script');
+            s.src = scriptUrl;
+            s.defer = true;
+            s.onload = function () {
+                if (window.TranslationManager) {
+                    const ok = window.TranslationManager.setLanguage(lang);
+                    if (ok) {
+                        setTimeout(() => window.TranslationManager.applyTranslations(), 200);
+                    } else {
+                        alert('Failed to change language. Please try again.');
+                    }
+                } else {
+                    alert('Translation system not loaded. Please refresh the page.');
+                }
+            };
+            s.onerror = function () {
+                alert('Failed to load translation resources.');
+            };
+            document.head.appendChild(s);
             return;
         }
         
-        // Change language
-        console.log('Calling TranslationManager.setLanguage...');
+        // Change language when TranslationManager is available
         const success = window.TranslationManager.setLanguage(lang);
-        
         if (success) {
-            console.log('✅ Language changed successfully to:', lang);
-            // Force re-apply after a short delay to catch any missed elements
-            setTimeout(() => {
-                window.TranslationManager.applyTranslations();
-            }, 200);
+            setTimeout(() => window.TranslationManager.applyTranslations(), 200);
         } else {
-            console.error('❌ Failed to change language');
             alert('Failed to change language. Please try again.');
         }
     }
