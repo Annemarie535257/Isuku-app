@@ -1,0 +1,1190 @@
+{% extends "base.html" %}
+
+{% block title %}Household Dashboard - Isuku{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ static('css/dashboard.css') }}">
+<style>
+    /* Dashboard Layout */
+    .dashboard-wrapper {
+        display: flex;
+        min-height: 100vh;
+        background: #ecfdf5; /* soft green like landing hero */
+    }
+    
+    /* Sidebar Styles */
+    .dashboard-sidebar {
+        width: 220px;
+        background: #064e3b; /* deep green */
+        color: white;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        height: 100vh;
+        overflow-y: auto;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+    }
+    
+    .sidebar-logo {
+        padding: 8px 16px;
+        border-bottom: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;  /* no separate background band behind logo */
+    }
+
+    .sidebar-logo img {
+        height: 120px;
+        width: auto;
+        max-width: 100%;
+        object-fit: contain;
+    }
+    
+    .sidebar-logo-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+    }
+    
+    .sidebar-logo-text {
+        font-size: 24px;
+        font-weight: 700;
+        color: white;
+    }
+    
+    .sidebar-action-btn {
+        margin: 20px;
+        padding: 14px 20px;
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    }
+    
+    .sidebar-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
+    }
+    
+    .sidebar-menu {
+        flex: 1;
+        padding: 20px 0;
+    }
+    
+    .menu-item {
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: rgba(226, 232, 240, 0.85);
+        cursor: pointer;
+        transition: all 0.3s;
+        border-left: 3px solid transparent;
+        text-decoration: none;
+    }
+    
+    .menu-item:hover {
+        background: rgba(16, 185, 129, 0.15);
+        color: #ecfdf5;
+        text-decoration: none;
+    }
+    
+    .menu-item.active {
+        background: rgba(5, 150, 105, 0.2);
+        color: #10b981;
+        border-left-color: #10b981;
+    }
+    
+    .menu-item i {
+        width: 20px;
+        font-size: 18px;
+    }
+    
+    /* Language selector (header) */
+    .language-dropdown {
+        min-width: 140px;
+        padding: 8px 12px;
+        border-radius: 9999px;
+        border: 1px solid #d1d5db;
+        background: #ffffff;
+        color: #374151;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    
+    .language-dropdown option {
+        background: #ffffff;
+        color: #111827;
+    }
+    
+    /* Main Content Area */
+    .dashboard-main {
+        flex: 1;
+        margin-left: 220px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Top Header */
+    .dashboard-header {
+        background: white;
+        padding: 16px 32px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    
+    .header-search {
+        flex: 1;
+        max-width: 400px;
+        position: relative;
+    }
+    
+    .header-search input {
+        width: 100%;
+        padding: 10px 16px 10px 40px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    
+    .header-search i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+    
+    .header-profile {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .profile-notification {
+        position: relative;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 8px;
+        transition: background 0.3s;
+    }
+    
+    .profile-notification:hover {
+        background: #f3f4f6;
+    }
+    
+    .profile-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 8px;
+        transition: background 0.3s;
+        position: relative;
+    }
+    
+    .profile-user:hover {
+        background: #f3f4f6;
+    }
+    
+    .profile-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+    }
+    
+    .profile-name {
+        font-weight: 600;
+        color: #111827;
+    }
+    
+    .profile-dropdown {
+        position: absolute;
+        top: 56px;
+        right: 0;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+        padding: 8px 0;
+        min-width: 220px;
+        z-index: 60;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .profile-dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 16px;
+        font-size: 14px;
+        color: #374151;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s, padding-left 0.2s;
+    }
+    
+    .profile-dropdown-item i {
+        width: 18px;
+        color: #6b7280;
+    }
+    
+    .profile-dropdown-item:hover {
+        background: #f3f4f6;
+        color: #059669;
+        padding-left: 20px;
+    }
+    
+    .profile-dropdown-divider {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 4px 0;
+    }
+    
+    /* Content Area */
+    .dashboard-content {
+        flex: 1;
+        padding: 32px;
+    }
+    
+    .content-header {
+        margin-bottom: 32px;
+    }
+    
+    .content-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+    
+    .content-subtitle {
+        color: #6b7280;
+        font-size: 16px;
+    }
+    
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+    }
+    
+    .stat-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+    }
+    
+    .stat-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+    
+    .stat-card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+    
+    .stat-card-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+    
+    .stat-card-label {
+        color: #6b7280;
+        font-size: 14px;
+    }
+    
+    /* Content Grid */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+    
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    
+    .card-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #111827;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Mobile layout */
+    @media (max-width: 768px) {
+        .dashboard-wrapper {
+            flex-direction: column;
+        }
+
+        .dashboard-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 40;
+            width: 240px;
+            max-width: 80%;
+            height: 100vh;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .dashboard-sidebar.open {
+            transform: translateX(0);
+        }
+        
+        .dashboard-main {
+            margin-left: 0;
+        }
+
+        .dashboard-header {
+            padding: 12px 16px;
+        }
+
+        .header-search {
+            display: none;
+        }
+
+        .mobile-menu-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            padding: 8px;
+            border-radius: 9999px;
+            background: #059669;
+            color: #ffffff;
+            cursor: pointer;
+        }
+    }
+
+    .mobile-menu-toggle {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Left Sidebar -->
+    <aside class="dashboard-sidebar">
+        <!-- Logo -->
+        <div class="sidebar-logo">
+            <img src="{{ static('images/logo 1.png') }}" alt="Isuku Logo" class="h-10 w-auto" onerror="this.style.display='none';">
+        </div>
+        
+        <!-- Action Button -->
+        <button class="sidebar-action-btn" onclick="document.getElementById('pickup-form').scrollIntoView({behavior: 'smooth'})">
+            <i class="fas fa-plus-circle"></i>
+            <span data-translate="Request Pickup">Request Pickup</span>
+        </button>
+        
+        <!-- Navigation Menu -->
+        <nav class="sidebar-menu">
+            <a href="{{ url('registration:household_dashboard') }}" class="menu-item {% if current_page == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i>
+                <span data-translate="Dashboard">Dashboard</span>
+            </a>
+            <a href="{{ url('registration:household_requests') }}" class="menu-item {% if current_page == 'requests' %}active{% endif %}">
+                <i class="fas fa-list"></i>
+                <span data-translate="My Requests">My Requests</span>
+            </a>
+            <a href="{{ url('registration:household_notifications') }}" class="menu-item {% if current_page == 'notifications' %}active{% endif %}">
+                <i class="fas fa-bell"></i>
+                <span data-translate="Notifications">Notifications</span>
+            </a>
+            <a href="{{ url('registration:household_help') }}" class="menu-item {% if current_page == 'help' %}active{% endif %}">
+                <i class="fas fa-question-circle"></i>
+                <span data-translate="Help & Support">Help &amp; Support</span>
+            </a>
+            <a href="{{ url('registration:household_history') }}" class="menu-item {% if current_page == 'history' %}active{% endif %}">
+                <i class="fas fa-history"></i>
+                <span data-translate="History">History</span>
+            </a>
+            <a href="{{ url('registration:household_settings') }}" class="menu-item {% if current_page == 'settings' %}active{% endif %}">
+                <i class="fas fa-cog"></i>
+                <span data-translate="Settings">Settings</span>
+            </a>
+        </nav>
+    </aside>
+    
+    <!-- Main Content Area -->
+    <main class="dashboard-main">
+        <!-- Top Header -->
+        <header class="dashboard-header">
+            <div id="mobile-menu-toggle" class="mobile-menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div class="header-search">
+                <i class="fas fa-search"></i>
+                                <input type="text" placeholder="Search..." data-translate="Search...">
+            </div>
+            
+            <div class="header-profile">
+                <div class="profile-notification">
+                    <i class="fas fa-bell" style="font-size: 20px; color: #6b7280;"></i>
+                    {% if notifications %}
+                    <span style="position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span>
+                    {% endif %}
+                </div>
+
+                <!-- Language selector moved from sidebar into header -->
+                <div>
+                    <select id="language-select" class="language-dropdown" style="min-width: 140px;">
+                        <option value="en" data-translate="English">English</option>
+                        <option value="rw" data-translate="Kinyarwanda">Kinyarwanda</option>
+                        <option value="fr" data-translate="Français">Français</option>
+                    </select>
+                </div>
+                
+                <div class="profile-user" id="profile-menu-toggle">
+                    <div class="profile-avatar">
+                        {% if household.user.first_name %}{{ household.user.first_name.0 }}{{ household.user.last_name.0 }}{% else %}{{ household.user.username.0|upper }}{% endif %}
+                    </div>
+                    <div>
+                        <div class="profile-name">{% if household.user.first_name %}{{ household.user.first_name }} {{ household.user.last_name }}{% else %}{{ household.user.username }}{% endif %}</div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="color: #9ca3af; font-size: 12px;"></i>
+                </div>
+                
+                <div class="profile-dropdown" id="profile-dropdown" style="display: none;">
+                    <a href="{{ url('registration:household_profile') }}" class="profile-dropdown-item">
+                        <i class="fas fa-user"></i>
+                        <span data-translate="View Profile">View Profile</span>
+                    </a>
+                    <a href="{{ url('registration:household_settings') }}" class="profile-dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        <span data-translate="Settings">Settings</span>
+                    </a>
+                    <div class="profile-dropdown-divider"></div>
+                    <a href="{{ url('registration:logout') }}" class="profile-dropdown-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span data-translate="Logout">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Content Header -->
+            <div class="content-header">
+                {% if current_page == 'dashboard' %}
+                <h1 class="content-title" data-translate="Household Dashboard">Household Dashboard</h1>
+                <p class="content-subtitle" data-translate="Manage your waste pickup requests and view your profile">Manage your waste pickup requests and view your profile</p>
+                {% elif current_page == 'requests' %}
+                <h1 class="content-title" data-translate="My Requests">My Requests</h1>
+                <p class="content-subtitle" data-translate="View all your waste pickup requests">View all your waste pickup requests</p>
+                {% elif current_page == 'notifications' %}
+                <h1 class="content-title" data-translate="Notifications">Notifications</h1>
+                <p class="content-subtitle" data-translate="Stay updated with your pickup requests">Stay updated with your pickup requests</p>
+                {% elif current_page == 'profile' %}
+                <h1 class="content-title" data-translate="My Profile">My Profile</h1>
+                <p class="content-subtitle" data-translate="View and manage your profile information">View and manage your profile information</p>
+                {% elif current_page == 'history' %}
+                <h1 class="content-title" data-translate="Pickup History">Pickup History</h1>
+                <p class="content-subtitle" data-translate="View your completed pickup requests">View your completed pickup requests</p>
+                {% elif current_page == 'settings' %}
+                <h1 class="content-title" data-translate="Settings">Settings</h1>
+                <p class="content-subtitle" data-translate="Manage your account settings">Manage your account settings</p>
+                {% elif current_page == 'help' %}
+                <h1 class="content-title" data-translate="Help & Support">Help &amp; Support</h1>
+                <p class="content-subtitle" data-translate="Find answers to common questions or contact support">Find answers to common questions or contact support</p>
+                {% endif %}
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon" style="background: #dbeafe; color: #2563eb;">
+                            <i class="fas fa-recycle"></i>
+                        </div>
+                        <i class="fas fa-ellipsis-v" style="color: #9ca3af; cursor: pointer;"></i>
+                    </div>
+                    <div class="stat-card-value">{{ total_requests }}</div>
+                    <div class="stat-card-label" data-translate="Total Requests">Total Requests</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon" style="background: #d1fae5; color: #059669;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <i class="fas fa-ellipsis-v" style="color: #9ca3af; cursor: pointer;"></i>
+                    </div>
+                    <div class="stat-card-value">{{ completed_requests }}</div>
+                    <div class="stat-card-label" data-translate="Completed">Completed</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon" style="background: #fef3c7; color: #d97706;">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <i class="fas fa-ellipsis-v" style="color: #9ca3af; cursor: pointer;"></i>
+                    </div>
+                    <div class="stat-card-value">{{ pending_requests }}</div>
+                    <div class="stat-card-label" data-translate="Pending">Pending</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon" style="background: #f3e8ff; color: #9333ea;">
+                            <i class="fas fa-weight"></i>
+                        </div>
+                        <i class="fas fa-ellipsis-v" style="color: #9ca3af; cursor: pointer;"></i>
+                    </div>
+                    <div class="stat-card-value">{{ (total_weight or 0)|format("%.1f") }} kg</div>
+                    <div class="stat-card-label" data-translate="Total Waste">Total Waste</div>
+                </div>
+            </div>
+
+            {% if current_page == 'dashboard' %}
+            <!-- Pickup Calendar Section -->
+            <div class="content-card" style="margin-bottom: 24px; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid #059669;">
+                <div class="card-header" style="border-bottom: 2px solid #059669; padding-bottom: 16px; margin-bottom: 20px;">
+                    <h2 class="card-title" style="color: #065f46;" data-translate="Pickup Calendar">Pickup Calendar</h2>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="color: #065f46; font-weight: 600; font-size: 18px;">{{ current_month }} {{ current_year }}</span>
+                        <i class="fas fa-calendar-alt" style="color: #059669; font-size: 24px;"></i>
+                    </div>
+                </div>
+                
+                <!-- Calendar Grid -->
+                <div style="margin-bottom: 24px;">
+                    <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 12px;">
+                        <div style="text-align: center; padding: 12px; font-weight: 700; color: #065f46; font-size: 14px;">Sun</div>
+                        <div style="text-align: center; padding: 12px; font-weight: 700; color: #065f46; font-size: 14px;">Mon</div>
+                        <div style="text-align: center; padding: 12px; font-weight: 700; color: #065f46; font-size: 14px;">Tue</div>
+                        <div style="text-align: center; padding: 12px; font-weight: 700; color: #059669; font-size: 14px; background: #d1fae5; border-radius: 6px;">Wed</div>
+                        <div style="text-align: center; padding: 12px; font-weight: 700; color: #065f46; font-size: 14px;">Thu</div>
+                        <div style="text-align: center; padding: 12px; font-weight: 700; color: #065f46; font-size: 14px;">Fri</div>
+                        <div style="text-align: center; padding: 12px; font-weight: 700; color: #065f46; font-size: 14px;">Sat</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;">
+                        {% for day_data in calendar_days %}
+                            {% if day_data %}
+                            <div style="
+                                aspect-ratio: 1;
+                                padding: 8px;
+                                border-radius: 8px;
+                                text-align: center;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                justify-content: center;
+                                cursor: pointer;
+                                transition: all 0.3s;
+                                {% if day_data.is_today %}border: 2px solid #059669; background: #ecfdf5;{% endif %}
+                                {% if day_data.has_pickup %}background: #059669; color: white; font-weight: 700;{% elif day_data.is_wednesday %}background: #d1fae5; color: #065f46; font-weight: 600;{% else %}background: white; color: #374151;{% endif %}
+                            ">
+                                <span style="font-size: 16px;">{{ day_data.day }}</span>
+                                {% if day_data.has_pickup %}
+                                <i class="fas fa-recycle" style="font-size: 12px; margin-top: 4px;"></i>
+                                {% elif day_data.is_wednesday %}
+                                <i class="fas fa-calendar-week" style="font-size: 10px; margin-top: 2px; color: #059669;"></i>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <div style="aspect-ratio: 1;"></div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div style="margin-top: 16px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; background: #059669; border-radius: 4px;"></div>
+                            <span style="font-size: 12px; color: #065f46;" data-translate="Scheduled Pickup">Scheduled Pickup</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; background: #d1fae5; border-radius: 4px; border: 1px solid #059669;"></div>
+                            <span style="font-size: 12px; color: #065f46;" data-translate="Regular Pickup Day (Wednesday)">Regular Pickup Day (Wednesday)</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; background: #ecfdf5; border: 2px solid #059669; border-radius: 4px;"></div>
+                            <span style="font-size: 12px; color: #065f46;" data-translate="Today">Today</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="border-top: 2px solid #059669; padding-top: 20px; margin-top: 20px;">
+                    <h3 style="color: #065f46; margin-bottom: 16px; font-size: 18px;" data-translate="Upcoming Pickup Details">Upcoming Pickup Details</h3>
+                {% if scheduled_pickups or pending_for_calendar %}
+                <div style="display: grid; gap: 16px;">
+                    {% for pickup in scheduled_pickups %}
+                    <div style="background: white; border-left: 5px solid #059669; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(5, 150, 105, 0.15); transition: all 0.3s;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                                    <div style="background: #059669; color: white; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 14px;">
+                                        <i class="fas fa-calendar-day"></i> {{ pickup.scheduled_date|date('M d, Y') }}
+                                    </div>
+                                    <span style="font-size: 14px; color: #065f46; font-weight: 600;">
+                                        <i class="fas fa-clock"></i> {{ pickup.scheduled_date|date('h:i A') }}
+                                    </span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 8px; background: #f0fdf4; border-radius: 6px;">
+                                    <i class="fas fa-trash-alt" style="color: #059669; font-size: 16px;"></i>
+                                    <span style="font-size: 15px; font-weight: 600; color: #065f46;">
+                                        {{ pickup.waste_category.name }}
+                                    </span>
+                                    <span style="font-size: 14px; color: #6b7280;">•</span>
+                                    <span style="font-size: 14px; color: #065f46; font-weight: 600;">
+                                        {{ pickup.quantity }} kg
+                                    </span>
+                                </div>
+                                {% if pickup.collector %}
+                                <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 12px; background: #d1fae5; border-radius: 8px; border: 1px solid #059669;">
+                                    <i class="fas fa-user-tie" style="color: #059669; font-size: 16px;"></i>
+                                    <span style="font-size: 14px; color: #065f46; font-weight: 600;">
+                                        <strong data-translate="Collector">Collector:</strong> 
+                                        {% if pickup.collector.user.first_name %}{{ pickup.collector.user.first_name }} {{ pickup.collector.user.last_name }}{% else %}{{ pickup.collector.user.username }}{% endif %}
+                                    </span>
+                                    <span style="font-size: 14px; color: #6b7280;">•</span>
+                                    <a href="tel:{{ pickup.collector.phone_number }}" style="font-size: 14px; color: #059669; text-decoration: none; display: flex; align-items: center; gap: 4px; font-weight: 600;">
+                                        <i class="fas fa-phone"></i>
+                                        {{ pickup.collector.phone_number }}
+                                    </a>
+                                </div>
+                                {% else %}
+                                <div style="margin-top: 10px; padding: 12px; background: #fef3c7; border-radius: 8px; border: 1px solid #d97706;">
+                                    <span style="font-size: 14px; color: #92400e; font-weight: 600;">
+                                        <i class="fas fa-clock"></i>
+                                        <span data-translate="Awaiting collector assignment">Awaiting collector assignment</span>
+                                    </span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <span class="status-badge {% if pickup.status == 'Scheduled' %}status-pending{% else %}status-in-progress{% endif %}" style="margin-left: 12px; font-size: 12px; padding: 6px 12px;">
+                                {{ pickup.status }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    {% for pickup in pending_for_calendar %}
+                    <div style="background: white; border-left: 5px solid #d97706; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(217, 119, 6, 0.15);">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                                    <div style="background: #fef3c7; color: #92400e; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 14px;">
+                                        <i class="fas fa-clock"></i> <span data-translate="Pending Schedule">Pending Schedule</span>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 8px; background: #f0fdf4; border-radius: 6px;">
+                                    <i class="fas fa-trash-alt" style="color: #059669; font-size: 16px;"></i>
+                                    <span style="font-size: 15px; font-weight: 600; color: #065f46;">
+                                        {{ pickup.waste_category.name }}
+                                    </span>
+                                    <span style="font-size: 14px; color: #6b7280;">•</span>
+                                    <span style="font-size: 14px; color: #065f46; font-weight: 600;">
+                                        {{ pickup.quantity }} kg
+                                    </span>
+                                </div>
+                                {% if pickup.collector %}
+                                <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 12px; background: #d1fae5; border-radius: 8px; border: 1px solid #059669;">
+                                    <i class="fas fa-user-tie" style="color: #059669; font-size: 16px;"></i>
+                                    <span style="font-size: 14px; color: #065f46; font-weight: 600;">
+                                        <strong data-translate="Assigned Collector">Assigned Collector:</strong> 
+                                        {% if pickup.collector.user.first_name %}{{ pickup.collector.user.first_name }} {{ pickup.collector.user.last_name }}{% else %}{{ pickup.collector.user.username }}{% endif %}
+                                    </span>
+                                    <span style="font-size: 14px; color: #6b7280;">•</span>
+                                    <a href="tel:{{ pickup.collector.phone_number }}" style="font-size: 14px; color: #059669; text-decoration: none; display: flex; align-items: center; gap: 4px; font-weight: 600;">
+                                        <i class="fas fa-phone"></i>
+                                        {{ pickup.collector.phone_number }}
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <span class="status-badge status-pending" style="margin-left: 12px; font-size: 12px; padding: 6px 12px;">
+                                Pending
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 40px 20px;">
+                    <i class="fas fa-calendar-times" style="font-size: 48px; color: #9ca3af; margin-bottom: 16px; opacity: 0.5;"></i>
+                    <p style="font-size: 16px; color: #6b7280;" data-translate="No scheduled pickups yet. Your upcoming pickups will appear here.">No scheduled pickups yet. Your upcoming pickups will appear here.</p>
+                </div>
+                {% endif %}
+                </div>
+            </div>
+            <!-- Main Content Grid -->
+            <div class="content-grid">
+                <!-- Left Column: Pickup Requests Table -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2 class="card-title" data-translate="My Pickup Requests">My Pickup Requests</h2>
+                    </div>
+                    {% if pickup_requests %}
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th data-translate="ID">ID</th>
+                                    <th data-translate="Category">Category</th>
+                                    <th data-translate="Quantity">Quantity</th>
+                                    <th data-translate="Status">Status</th>
+                                    <th data-translate="Date">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for request in pickup_requests %}
+                                <tr>
+                                    <td class="font-semibold text-gray-900">#{{ request.id }}</td>
+                                    <td class="text-gray-700">{{ request.waste_category.name }}</td>
+                                    <td class="text-gray-700">{{ request.quantity }} kg</td>
+                                    <td>
+                                        <span class="status-badge
+                                            {% if request.status == 'Completed' %}status-completed
+                                            {% elif request.status == 'Pending' %}status-pending
+                                            {% elif request.status == 'In Progress' %}status-in-progress
+                                            {% else %}status-cancelled{% endif %}">
+                                            {{ request.status }}
+                                        </span>
+                                    </td>
+                                    <td class="text-gray-600">{{ request.created_at|date('M d, Y') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-inbox"></i>
+                        </div>
+                        <p class="empty-state-text" data-translate="No pickup requests yet. Create your first request!">No pickup requests yet. Create your first request!</p>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Right Column: Quick Actions & Notifications -->
+                <div style="display: flex; flex-direction: column; gap: 24px;">
+                    <!-- Request Pickup Form -->
+                    <div class="content-card" id="pickup-form">
+                        <div class="card-header">
+                            <h2 class="card-title" data-translate="Request Pickup">Request Pickup</h2>
+                        </div>
+                        <form method="POST" action="{{ url('registration:create_pickup_request') }}">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                            <div style="margin-bottom: 16px;">
+                                <label class="block text-gray-700 mb-2" style="font-weight: 600; font-size: 14px;" data-translate="Waste Category">Waste Category:</label>
+                                <select name="waste_category" required
+                                        style="width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                                    <option value="" data-translate="Select Category">Select Category</option>
+                                    {% for category in waste_categories %}
+                                    <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <label class="block text-gray-700 mb-2" style="font-weight: 600; font-size: 14px;" data-translate="Quantity (kg)">Quantity (kg):</label>
+                                <input type="number" name="quantity" step="0.1" required
+                                       style="width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <label class="block text-gray-700 mb-2" style="font-weight: 600; font-size: 14px;" data-translate="Address">Address:</label>
+                                <textarea name="address" rows="2" required
+                                          style="width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; resize: vertical;">{{ household.street_address }}</textarea>
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <label class="block text-gray-700 mb-2" style="font-weight: 600; font-size: 14px;" data-translate="Notes">Notes:</label>
+                                <textarea name="notes" rows="2"
+                                          style="width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; resize: vertical;"></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary" style="width: 100%;">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                <span data-translate="Request Pickup">Request Pickup</span>
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Notifications -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h2 class="card-title" data-translate="Notifications">Notifications</h2>
+                        </div>
+                        {% if notifications %}
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            {% for notification in notifications %}
+                            <div class="notification-item">
+                                <p class="notification-title">{{ notification.title }}</p>
+                                <p class="notification-message">{{ notification.message }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-bell-slash"></i>
+                            </div>
+                            <p class="empty-state-text" data-translate="No new notifications">No new notifications</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% elif current_page == 'requests' %}
+            <!-- All Requests Page -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title" data-translate="All Pickup Requests">All Pickup Requests</h2>
+                </div>
+                {% if pickup_requests %}
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th data-translate="ID">ID</th>
+                                <th data-translate="Category">Category</th>
+                                <th data-translate="Quantity">Quantity</th>
+                                <th data-translate="Status">Status</th>
+                                <th data-translate="Collector">Collector</th>
+                                <th data-translate="Date">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in pickup_requests %}
+                            <tr>
+                                <td class="font-semibold text-gray-900">#{{ request.id }}</td>
+                                <td class="text-gray-700">{{ request.waste_category.name }}</td>
+                                <td class="text-gray-700">{{ request.quantity }} kg</td>
+                                <td>
+                                    <span class="status-badge
+                                        {% if request.status == 'Completed' %}status-completed
+                                        {% elif request.status == 'Pending' %}status-pending
+                                        {% elif request.status == 'In Progress' %}status-in-progress
+                                        {% else %}status-cancelled{% endif %}">
+                                        {{ request.status }}
+                                    </span>
+                                </td>
+                                <td class="text-gray-700">
+                                    {% if request.collector %}
+                                        {% if request.collector.user.first_name %}{{ request.collector.user.first_name }} {{ request.collector.user.last_name }}{% else %}{{ request.collector.user.username }}{% endif %}
+                                    {% else %}
+                                        <span style="color: #9ca3af;" data-translate="Not assigned">Not assigned</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-gray-600">{{ request.created_at|date('M d, Y') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <p class="empty-state-text" data-translate="No pickup requests yet.">No pickup requests yet.</p>
+                </div>
+                {% endif %}
+            </div>
+            {% elif current_page == 'notifications' %}
+            <!-- Notifications Page -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title" data-translate="All Notifications">All Notifications</h2>
+                </div>
+                {% if notifications %}
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    {% for notification in notifications %}
+                    <div class="notification-item" style="{% if not notification.is_read %}background: #eff6ff; border-left-color: #2563eb;{% endif %}">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div style="flex: 1;">
+                                <p class="notification-title">{{ notification.title }}</p>
+                                <p class="notification-message">{{ notification.message }}</p>
+                                <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">{{ notification.created_at|date('M d, Y h:i A') }}</p>
+                            </div>
+                            {% if not notification.is_read %}
+                            <span style="width: 8px; height: 8px; background: #2563eb; border-radius: 50%; margin-left: 12px;"></span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-bell-slash"></i>
+                    </div>
+                    <p class="empty-state-text" data-translate="No notifications">No notifications</p>
+                </div>
+                {% endif %}
+            </div>
+            {% elif current_page == 'profile' %}
+            <!-- Profile Page -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title" data-translate="Profile Information">Profile Information</h2>
+                </div>
+                <div class="profile-section">
+                    <div class="profile-info">
+                        <div class="profile-info-item">
+                            <div class="profile-info-label" data-translate="Full Name">Full Name</div>
+                            <div class="profile-info-value">
+                                {% if household.user.first_name %}{{ household.user.first_name }} {{ household.user.last_name }}{% else %}{{ household.user.username }}{% endif %}
+                            </div>
+                        </div>
+                        <div class="profile-info-item">
+                            <div class="profile-info-label" data-translate="Email">Email</div>
+                            <div class="profile-info-value">{{ household.user.email }}</div>
+                        </div>
+                        <div class="profile-info-item">
+                            <div class="profile-info-label" data-translate="Phone Number">Phone Number</div>
+                            <div class="profile-info-value">{{ household.phone_number }}</div>
+                        </div>
+                        <div class="profile-info-item">
+                            <div class="profile-info-label" data-translate="Address">Address</div>
+                            <div class="profile-info-value">{{ household.street_address or 'Not provided' }}</div>
+                        </div>
+                        {% if household.province %}
+                        <div class="profile-info-item">
+                            <div class="profile-info-label" data-translate="Location">Location</div>
+                            <div class="profile-info-value">
+                                {% if household.village %}{{ household.village.name }}, {% endif %}
+                                {% if household.cell %}{{ household.cell.name }}, {% endif %}
+                                {% if household.sector %}{{ household.sector.name }}, {% endif %}
+                                {% if household.district %}{{ household.district.name }}, {% endif %}
+                                {% if household.province %}{{ household.province.name }}{% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% elif current_page == 'history' %}
+            <!-- History Page -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title" data-translate="Completed Pickups">Completed Pickups</h2>
+                </div>
+                {% if pickup_requests %}
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th data-translate="ID">ID</th>
+                                <th data-translate="Category">Category</th>
+                                <th data-translate="Quantity">Quantity</th>
+                                <th data-translate="Collector">Collector</th>
+                                <th data-translate="Completed Date">Completed Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in pickup_requests %}
+                            <tr>
+                                <td class="font-semibold text-gray-900">#{{ request.id }}</td>
+                                <td class="text-gray-700">{{ request.waste_category.name }}</td>
+                                <td class="text-gray-700">{{ request.quantity }} kg</td>
+                                <td class="text-gray-700">
+                                    {% if request.collector %}
+                                        {% if request.collector.user.first_name %}{{ request.collector.user.first_name }} {{ request.collector.user.last_name }}{% else %}{{ request.collector.user.username }}{% endif %}
+                                    {% else %}
+                                        <span style="color: #9ca3af;">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-gray-600">
+                                    {% if request.completed_date %}{{ request.completed_date|date('M d, Y') }}{% else %}{{ request.created_at|date('M d, Y') }}{% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <p class="empty-state-text" data-translate="No completed pickups yet">No completed pickups yet</p>
+                </div>
+                {% endif %}
+            </div>
+            {% elif current_page == 'settings' %}
+            <!-- Settings Page -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title" data-translate="Account Settings">Account Settings</h2>
+                </div>
+                <div style="padding: 24px;">
+                    <p style="color: #6b7280; margin-bottom: 24px;" data-translate="Settings functionality coming soon">Settings functionality coming soon</p>
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div style="padding: 16px; background: #f9fafb; border-radius: 8px;">
+                            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 8px;" data-translate="Language Preferences">Language Preferences</h3>
+                            <p style="font-size: 14px; color: #6b7280;" data-translate="Change your preferred language">Change your preferred language</p>
+                        </div>
+                        <div style="padding: 16px; background: #f9fafb; border-radius: 8px;">
+                            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 8px;" data-translate="Notification Settings">Notification Settings</h3>
+                            <p style="font-size: 14px; color: #6b7280;" data-translate="Manage how you receive notifications">Manage how you receive notifications</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% elif current_page == 'help' %}
+            <!-- Help & Support Page -->
+            <div class="content-grid">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2 class="card-title" data-translate="Frequently Asked Questions">Frequently Asked Questions</h2>
+                    </div>
+                    {% if faqs %}
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        {% for item in faqs %}
+                        <div style="padding: 16px; border-radius: 10px; background: #f9fafb; border: 1px solid #e5e7eb;">
+                            <p style="font-weight: 600; color: #111827; margin-bottom: 8px;">{{ item.question }}</p>
+                            <p style="color: #4b5563; font-size: 14px;">{{ item.answer }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2 class="card-title" data-translate="Contact Support">Contact Support</h2>
+                    </div>
+                    <form method="POST" action="{{ url('registration:contact_form') }}" class="space-y-4">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="Your Name">Your Name</label>
+                            <input type="text" name="name" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent"
+                                   value="{% if household.user.first_name %}{{ household.user.first_name }} {{ household.user.last_name }}{% else %}{{ household.user.username }}{% endif %}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="Email">Email</label>
+                            <input type="email" name="email" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent"
+                                   value="{{ household.user.email }}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" data-translate="Message">Message</label>
+                            <textarea name="message" rows="4" required
+                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-primary focus:border-transparent"
+                                      placeholder="Describe your issue or question"></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary w-full">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            <span data-translate="Send Message">Send Message</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Language switcher
+        const langSelect = document.getElementById('language-select');
+        if (langSelect && window.TranslationManager) {
+            const currentLang = window.TranslationManager.getCurrentLanguage();
+            if (currentLang) {
+                langSelect.value = currentLang;
+            }
+            langSelect.addEventListener('change', function() {
+                window.TranslationManager.setLanguage(this.value);
+            });
+        }
+
+        // Mobile sidebar toggle
+        const mobileToggle = document.getElementById('mobile-menu-toggle');
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        if (mobileToggle && sidebar) {
+            mobileToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+            });
+        }
+
+        // Profile dropdown toggle
+        const profileToggle = document.getElementById('profile-menu-toggle');
+        const profileDropdown = document.getElementById('profile-dropdown');
+        if (profileToggle && profileDropdown) {
+            profileToggle.addEventListener('click', function (event) {
+                event.stopPropagation();
+                if (profileDropdown.style.display === 'none' || !profileDropdown.style.display) {
+                    profileDropdown.style.display = 'block';
+                } else {
+                    profileDropdown.style.display = 'none';
+                }
+            });
+
+            document.addEventListener('click', function () {
+                profileDropdown.style.display = 'none';
+            });
+
+            profileDropdown.addEventListener('click', function (event) {
+                event.stopPropagation();
+            });
+        }
+    });
+</script>
+{% endblock %}

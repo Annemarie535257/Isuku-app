@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Household Login - Isuku{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-title {
+        color: #000;
+        font-weight: bold;
+        font-size: 24px;
+        text-transform: uppercase;
+        text-align: center;
+        margin-bottom: 24px;
+    }
+    .login-panel {
+        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 50%, #ecfdf5 100%);
+        border: 2px solid #059669;
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 8px 24px rgba(5, 150, 105, 0.15);
+    }
+    .logo-inside {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 32px;
+    }
+    .logo-inside img {
+        height: 100px !important;
+        width: auto;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    }
+    .logo-text-white {
+        font-size: 32px;
+        font-weight: bold;
+        color: #059669;
+        letter-spacing: 2px;
+        font-family: Arial, sans-serif;
+    }
+    .logo-trash-white {
+        color: #059669;
+        font-size: 28px;
+        vertical-align: baseline;
+        margin: 0 2px;
+    }
+    .panel-title {
+        color: #059669;
+        font-weight: bold;
+        font-size: 28px;
+        text-transform: uppercase;
+        text-align: center;
+        margin-bottom: 24px;
+        letter-spacing: 1px;
+    }
+    .form-label {
+        color: #047857;
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .form-input {
+        width: 100%;
+        padding: 12px;
+        background-color: white;
+        border: 2px solid #d1fae5;
+        border-radius: 8px;
+        color: #333;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    .form-input::placeholder {
+        color: #999;
+    }
+    .form-input:focus {
+        outline: none;
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+    }
+    .forgot-link {
+        color: #059669;
+        text-decoration: none;
+        font-size: 14px;
+        display: block;
+        margin-bottom: 16px;
+        font-weight: 500;
+    }
+    .forgot-link:hover {
+        color: #047857;
+        text-decoration: underline;
+    }
+    .submit-button {
+        width: 100%;
+        padding: 14px;
+        background-color: #059669;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    }
+    .submit-button:hover {
+        background-color: #047857;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(5, 150, 105, 0.4);
+    }
+    .switch-link {
+        color: #047857;
+        text-align: center;
+        margin-top: 16px;
+        font-size: 14px;
+    }
+    .switch-link a {
+        color: #059669;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-decoration: none;
+    }
+    .switch-link a:hover {
+        color: #047857;
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full">
+        <!-- Page Title -->
+        <h1 class="page-title" data-translate="HOUSEHOLDS">HOUSEHOLDS</h1>
+        
+        <div class="login-panel">
+            <!-- Logo inside panel -->
+            <div class="logo-inside">
+                <img src="{{ static('images/logo 1.png') }}" alt="Isuku Logo" class="h-24 w-auto" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="flex items-center" style="display:none;">
+                    <span class="logo-text-white">is</span>
+                    <i class="fas fa-trash-alt logo-trash-white"></i>
+                    <span class="logo-text-white">ku</span>
+                </div>
+            </div>
+            
+            <h2 class="panel-title" data-translate="LOGIN">LOGIN</h2>
+            
+            {% if messages %}
+            <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                {% for message in messages %}
+                <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <form method="POST" class="space-y-4">
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                
+                <div>
+                    <label class="form-label" data-translate="Email/Phone Number:">Email/Phone Number:</label>
+                    <input type="text" name="username" data-translate-placeholder="enter your email or phone number" placeholder="enter your email or phone number" required
+                           class="form-input">
+                </div>
+                
+                <div>
+                    <label class="form-label" data-translate="Password:">Password:</label>
+                    <input type="password" name="password" data-translate-placeholder="password" placeholder="password" required
+                           class="form-input">
+                </div>
+                
+                <a href="{{ url('registration:password_reset') }}" class="forgot-link" data-translate="Forgot password?">Forgot password?</a>
+                
+                <button type="submit" class="submit-button" data-translate="LOGIN">LOGIN</button>
+                
+                <p class="switch-link">
+                    <span data-translate="You don't have an account?">You don't have an account?</span> <a href="{{ url('registration:household_signup') }}" data-translate="SIGNUP">SIGNUP</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

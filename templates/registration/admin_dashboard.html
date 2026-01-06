@@ -1,0 +1,1420 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Isuku{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-wrapper {
+        display: flex;
+        min-height: 100vh;
+        background: #f3f4f6;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .dashboard-sidebar {
+        width: 220px;
+        background: #064e3b;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        height: 100vh;
+        overflow-y: auto;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+    }
+    .sidebar-logo {
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-logo img {
+        height: 110px;
+        width: auto;
+        object-fit: contain;
+        max-width: 100%;
+    }
+    .sidebar-badge {
+        margin: 12px 16px 4px 16px;
+        padding: 8px 12px;
+        border-radius: 9999px;
+        background: rgba(16, 185, 129, 0.18);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+    }
+    .sidebar-badge i {
+        color: #6ee7b7;
+    }
+    .sidebar-menu {
+        padding: 6px 8px 16px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .menu-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        margin: 2px 4px;
+        border-radius: 9999px;
+        color: #d1fae5;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    .menu-item i {
+        width: 18px;
+        text-align: center;
+        font-size: 15px;
+    }
+    .menu-item:hover {
+        background: rgba(16,185,129,0.2);
+        color: #ffffff;
+        transform: translateX(2px);
+    }
+    .menu-item.active {
+        background: linear-gradient(135deg, #22c55e, #16a34a, #15803d);
+        color: #ffffff;
+        box-shadow: 0 8px 20px rgba(16,185,129,0.35);
+    }
+    .dashboard-main {
+        flex: 1;
+        margin-left: 220px;
+        display: flex;
+        flex-direction: column;
+    }
+    .dashboard-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 24px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #ffffff;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+    }
+    .header-profile {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .profile-user {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 9999px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        cursor: pointer;
+    }
+    .profile-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 9999px;
+        background: #22c55e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 14px;
+    }
+    .profile-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #111827;
+    }
+    .profile-dropdown {
+        position: absolute;
+        right: 24px;
+        top: 64px;
+        width: 220px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 20px 45px rgba(15,23,42,0.15);
+        border: 1px solid #e5e7eb;
+        padding: 8px 0;
+        z-index: 30;
+    }
+    .profile-dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 14px;
+        font-size: 14px;
+        color: #374151;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .profile-dropdown-item:hover {
+        background: #f3f4f6;
+    }
+    .dashboard-content {
+        padding: 20px 24px 32px 24px;
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0,1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+    .stat-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 16px 18px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 30px rgba(15,23,42,0.08);
+    }
+    .stat-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .stat-card-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+    }
+    .stat-card-value {
+        font-size: 22px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 2px;
+    }
+    .stat-card-label {
+        font-size: 12px;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .content-grid {
+        display: grid;
+        grid-template-columns: minmax(0,2fr) minmax(0,1.4fr);
+        gap: 20px;
+        align-items: flex-start;
+    }
+    .content-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 18px 18px 20px 18px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 30px rgba(15,23,42,0.08);
+    }
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+    .card-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #111827;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 20px 12px;
+        color: #6b7280;
+    }
+    .empty-state-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 9999px;
+        background: #f3f4f6;
+        margin: 0 auto 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+    }
+    .status-badge {
+        display: inline-block;
+        border-radius: 9999px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    .status-scheduled {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    .status-in-progress {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+    .status-cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .data-table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+    }
+    .data-table tr:hover {
+        background: #f9fafb;
+    }
+    @media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2,minmax(0,1fr));
+        }
+        .content-grid {
+            grid-template-columns: minmax(0,1fr);
+        }
+    }
+    @media (max-width: 768px) {
+        .dashboard-sidebar {
+            position: fixed;
+            transform: translateX(-100%);
+            transition: transform 0.25s ease;
+            z-index: 40;
+        }
+        .dashboard-sidebar.open {
+            transform: translateX(0);
+        }
+        .dashboard-main {
+            margin-left: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-logo">
+            <img src="{{ static('images/logo 1.png') }}" alt="Isuku Logo" onerror="this.style.display='none';">
+        </div>
+        <div class="sidebar-badge">
+            <i class="fas fa-shield-alt"></i>
+            <span>{{ admin_profile.role }}</span>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="{{ url('registration:admin_dashboard') }}" class="menu-item {% if current_page == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url('registration:admin_pickups') }}" class="menu-item {% if current_page == 'pickups' %}active{% endif %}">
+                <i class="fas fa-recycle"></i>
+                <span>Pickups</span>
+            </a>
+            <a href="{{ url('registration:admin_households') }}" class="menu-item {% if current_page == 'households' %}active{% endif %}">
+                <i class="fas fa-users"></i>
+                <span>Households</span>
+            </a>
+            <a href="{{ url('registration:admin_collectors') }}" class="menu-item {% if current_page == 'collectors' %}active{% endif %}">
+                <i class="fas fa-truck"></i>
+                <span>Collectors</span>
+            </a>
+            <a href="{{ url('registration:admin_quick_actions') }}" class="menu-item {% if current_page == 'quick_actions' %}active{% endif %}">
+                <i class="fas fa-bolt"></i>
+                <span>Quick Actions</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <div>
+                <div style="font-size:18px;font-weight:700;color:#111827;">Admin Dashboard</div>
+                <div style="font-size:13px;color:#6b7280;">Monitor system statistics and manage users</div>
+            </div>
+            <div class="header-profile">
+                <div class="profile-user" id="admin-profile-toggle">
+                    <div class="profile-avatar">
+                        {% if admin_profile.user.first_name %}{{ admin_profile.user.first_name.0 }}{{ admin_profile.user.last_name.0 }}{% else %}{{ admin_profile.user.username.0|upper }}{% endif %}
+                    </div>
+                    <div class="profile-name">
+                        {% if admin_profile.user.first_name %}{{ admin_profile.user.first_name }} {{ admin_profile.user.last_name }}{% else %}{{ admin_profile.user.username }}{% endif %}
+                </div>
+                    <i class="fas fa-chevron-down" style="font-size:11px;color:#9ca3af;"></i>
+                    </div>
+                <div class="profile-dropdown" id="admin-profile-dropdown" style="display:none;">
+                    <div class="profile-dropdown-item" style="cursor:default;">
+                        <i class="fas fa-id-badge"></i>
+                        <span>{{ admin_profile.role }}</span>
+                    </div>
+                    <a href="/admin/" class="profile-dropdown-item">
+                        <i class="fas fa-cog"></i> Django Admin
+                    </a>
+                    <a href="{{ url('registration:logout') }}" class="profile-dropdown-item">
+                        <i class="fas fa-sign-out-alt"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <!-- Stats -->
+            <div class="stats-grid">
+            <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon" style="background:#dcfce7;color:#16a34a;">
+                        <i class="fas fa-home"></i>
+                    </div>
+                </div>
+                    <div class="stat-card-value">{{ total_households }}</div>
+                    <div class="stat-card-label">Households</div>
+            </div>
+            <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon" style="background:#dbeafe;color:#2563eb;">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                </div>
+                    <div class="stat-card-value">{{ total_collectors }}</div>
+                    <div class="stat-card-label">Collectors</div>
+            </div>
+            <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon" style="background:#fef3c7;color:#d97706;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+                    <div class="stat-card-value">{{ pending_pickups }}</div>
+                    <div class="stat-card-label">Pending Pickups</div>
+            </div>
+            <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon" style="background:#ecfdf5;color:#059669;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                    <div class="stat-card-value">{{ completed_pickups }}</div>
+                    <div class="stat-card-label">Completed Pickups</div>
+            </div>
+        </div>
+    
+            <!-- Main grid -->
+            <div class="content-grid">
+                <!-- Left: activity -->
+                <div>
+                    {% if current_page == 'dashboard' %}
+                    <div class="content-card" id="pickups-section">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Pickups</h2>
+                </div>
+                {% if recent_pickups %}
+                        <div style="display:flex;flex-direction:column;gap:10px;">
+                    {% for pickup in recent_pickups %}
+                            <div style="border-radius:10px;border:1px solid #e5e7eb;padding:10px 12px;background:#f9fafb;">
+                                <p style="font-weight:600;color:#111827;font-size:14px;margin-bottom:2px;">
+                                    Request #{{ pickup.id }}
+                                </p>
+                                <p style="font-size:13px;color:#4b5563;margin-bottom:2px;">
+                                    <i class="fas fa-user mr-1"></i>
+                                    {% if pickup.household.user.first_name %}{{ pickup.household.user.first_name }} {{ pickup.household.user.last_name }}{% else %}{{ pickup.household.user.username }}{% endif %}
+                                </p>
+                                <p style="font-size:12px;color:#6b7280;">
+                                    <i class="fas fa-calendar mr-1"></i>{{ pickup.created_at|date('M d, Y') }}
+                                </p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                            <p>No recent pickups</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    {% if current_page == 'pickups' %}
+                    <!-- Filter Section -->
+                    <div class="content-card" style="grid-column: 1 / -1;margin-bottom:20px;">
+                        <div class="card-header">
+                            <h2 class="card-title">Filter Pickups</h2>
+                        </div>
+                        <form method="GET" action="{{ url('registration:admin_pickups') }}" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end;">
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Status</label>
+                                <select name="status" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:white;">
+                                    <option value="">All Statuses</option>
+                                    <option value="Pending" {% if selected_status == 'Pending' %}selected{% endif %}>Pending</option>
+                                    <option value="Scheduled" {% if selected_status == 'Scheduled' %}selected{% endif %}>Scheduled</option>
+                                    <option value="In Progress" {% if selected_status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="Completed" {% if selected_status == 'Completed' %}selected{% endif %}>Completed</option>
+                                    <option value="Cancelled" {% if selected_status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Province</label>
+                                <select name="province" id="pickup-filter-province" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:white;">
+                                    <option value="">All Provinces</option>
+                                    {% for province in all_provinces %}
+                                    <option value="{{ province.id }}" {% if selected_province == province.id|string %}selected{% endif %}>{{ province.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">District</label>
+                                <select name="district" id="pickup-filter-district" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:white;">
+                                    <option value="">All Districts</option>
+                                    {% for district in districts %}
+                                    <option value="{{ district.id }}" {% if selected_district == district.id|string %}selected{% endif %}>{{ district.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <button type="submit" style="width:100%;padding:8px 16px;background:#059669;color:white;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;">
+                                    <i class="fas fa-filter mr-1"></i>Filter
+                                </button>
+                            </div>
+                            {% if selected_status or selected_province or selected_district %}
+                            <div>
+                                <a href="{{ url('registration:admin_pickups') }}" style="display:block;width:100%;padding:8px 16px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:600;font-size:14px;text-align:center;text-decoration:none;">
+                                    <i class="fas fa-times mr-1"></i>Clear
+                                </a>
+                            </div>
+                            {% endif %}
+                        </form>
+                    </div>
+                    
+                    <!-- All Pickup Requests Table -->
+                    <div class="content-card" style="grid-column: 1 / -1;margin-bottom:20px;">
+                        <div class="card-header">
+                            <h2 class="card-title">All Pickup Requests</h2>
+                            <span style="font-size:13px;color:#6b7280;">{{ all_pickups|length }} request{% if all_pickups|length != 1 %}s{% endif %}</span>
+                        </div>
+                        {% if all_pickups %}
+                        <div style="overflow-x:auto;">
+                            <table class="data-table" style="width:100%;border-collapse:collapse;">
+                                <thead>
+                                    <tr style="background:#f9fafb;border-bottom:2px solid #e5e7eb;">
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">ID</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Household</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Waste Type</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Quantity</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Collector</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Scheduled Date</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Status</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for pickup in all_pickups %}
+                                    <tr style="border-bottom:1px solid #e5e7eb;">
+                                        <td style="padding:12px;font-size:14px;color:#111827;font-weight:600;">#{{ pickup.id }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">
+                                            {% if pickup.household.user.first_name %}{{ pickup.household.user.first_name }} {{ pickup.household.user.last_name }}{% else %}{{ pickup.household.user.username }}{% endif %}
+                                        </td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">{{ pickup.waste_category.name }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">{{ pickup.quantity }} kg</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">
+                                            {% if pickup.collector %}
+                                                {% if pickup.collector.user.first_name %}{{ pickup.collector.user.first_name }} {{ pickup.collector.user.last_name }}{% else %}{{ pickup.collector.user.username }}{% endif %}
+                                            {% else %}
+                                                <span style="color:#9ca3af;">Unassigned</span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">
+                                            {% if pickup.scheduled_date %}{{ pickup.scheduled_date|date('M d, Y H:i') }}{% else %}<span style="color:#9ca3af;">-</span>{% endif %}
+                                        </td>
+                                        <td style="padding:12px;">
+                                            <span class="status-badge 
+                                                {% if pickup.status == 'Completed' %}status-completed
+                                                {% elif pickup.status == 'In Progress' %}status-in-progress
+                                                {% elif pickup.status == 'Scheduled' %}status-scheduled
+                                                {% elif pickup.status == 'Cancelled' %}status-cancelled
+                                                {% else %}status-pending{% endif %}" style="font-size:11px;padding:4px 8px;">
+                                                {{ pickup.status }}
+                                            </span>
+                                        </td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">{{ pickup.created_at|date('M d, Y') }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-inbox"></i>
+                            </div>
+                            <p>No pickup requests found.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Assigned Collectors Table -->
+                    <div class="content-card" style="grid-column: 1 / -1;margin-bottom:20px;">
+                        <div class="card-header">
+                            <h2 class="card-title">Assigned Collectors & Their Pickups</h2>
+                            <span style="font-size:13px;color:#6b7280;">{{ collector_assignments|length }} collector{% if collector_assignments|length != 1 %}s{% endif %} with assignments</span>
+                        </div>
+                        {% if collector_assignments %}
+                        <div style="display:flex;flex-direction:column;gap:20px;">
+                            {% for assignment in collector_assignments %}
+                            <div style="border:1px solid #e5e7eb;border-radius:12px;padding:16px;background:#f9fafb;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                                    <div>
+                                        <h3 style="font-size:16px;font-weight:600;color:#111827;margin-bottom:4px;">
+                                            {% if assignment.collector.user.first_name %}{{ assignment.collector.user.first_name }} {{ assignment.collector.user.last_name }}{% else %}{{ assignment.collector.user.username }}{% endif %}
+                                        </h3>
+                                        <p style="font-size:13px;color:#6b7280;">
+                                            <i class="fas fa-phone mr-1"></i>{{ assignment.collector.phone_number }}
+                                            {% if assignment.collector.district %} | <i class="fas fa-map-marker-alt mr-1"></i>{{ assignment.collector.district.name }}{% endif %}
+                                        </p>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <p style="font-size:14px;font-weight:600;color:#059669;">{{ assignment.total_assigned }} assigned</p>
+                                        <p style="font-size:12px;color:#6b7280;">{{ assignment.pending_count }} pending, {{ assignment.in_progress_count }} in progress</p>
+                                    </div>
+                                </div>
+                                <div style="overflow-x:auto;">
+                                    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                                        <thead>
+                                            <tr style="background:white;border-bottom:1px solid #e5e7eb;">
+                                                <th style="padding:8px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;">Request ID</th>
+                                                <th style="padding:8px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;">Household</th>
+                                                <th style="padding:8px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;">Waste Type</th>
+                                                <th style="padding:8px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;">Scheduled</th>
+                                                <th style="padding:8px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for pickup in assignment.assignments %}
+                                            <tr style="border-bottom:1px solid #f3f4f6;">
+                                                <td style="padding:8px;color:#111827;">#{{ pickup.id }}</td>
+                                                <td style="padding:8px;color:#4b5563;">
+                                                    {% if pickup.household.user.first_name %}{{ pickup.household.user.first_name }} {{ pickup.household.user.last_name }}{% else %}{{ pickup.household.user.username }}{% endif %}
+                                                </td>
+                                                <td style="padding:8px;color:#4b5563;">{{ pickup.waste_category.name }}</td>
+                                                <td style="padding:8px;color:#4b5563;">
+                                                    {% if pickup.scheduled_date %}{{ pickup.scheduled_date|date('M d, Y H:i') }}{% else %}<span style="color:#9ca3af;">-</span>{% endif %}
+                                                </td>
+                                                <td style="padding:8px;">
+                                                    <span class="status-badge 
+                                                        {% if pickup.status == 'Completed' %}status-completed
+                                                        {% elif pickup.status == 'In Progress' %}status-in-progress
+                                                        {% else %}status-scheduled{% endif %}" style="font-size:10px;padding:3px 6px;">
+                                                        {{ pickup.status }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <p>No collectors with assigned pickups.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Missed Pickups Table -->
+                    <div class="content-card" style="grid-column: 1 / -1;margin-bottom:20px;">
+                        <div class="card-header">
+                            <h2 class="card-title">Missed Pickups</h2>
+                            <span style="font-size:13px;color:#ef4444;">{{ missed_pickups|length }} missed pickup{% if missed_pickups|length != 1 %}s{% endif %}</span>
+                        </div>
+                        {% if missed_pickups %}
+                        <div style="overflow-x:auto;">
+                            <table class="data-table" style="width:100%;border-collapse:collapse;">
+                                <thead>
+                                    <tr style="background:#fef2f2;border-bottom:2px solid #fecaca;">
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">ID</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Household</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Waste Type</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Scheduled Date</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Collector</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Status</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Days Overdue</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for missed_item in missed_pickups %}
+                                    {% set pickup = missed_item.pickup %}
+                                    <tr style="border-bottom:1px solid #fee2e2;">
+                                        <td style="padding:12px;font-size:14px;color:#111827;font-weight:600;">#{{ pickup.id }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">
+                                            {% if pickup.household.user.first_name %}{{ pickup.household.user.first_name }} {{ pickup.household.user.last_name }}{% else %}{{ pickup.household.user.username }}{% endif %}
+                                        </td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">{{ pickup.waste_category.name }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">{{ pickup.scheduled_date|date('M d, Y H:i') }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">
+                                            {% if pickup.collector %}
+                                                {% if pickup.collector.user.first_name %}{{ pickup.collector.user.first_name }} {{ pickup.collector.user.last_name }}{% else %}{{ pickup.collector.user.username }}{% endif %}
+                                            {% else %}
+                                                <span style="color:#9ca3af;">Unassigned</span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="padding:12px;">
+                                            <span class="status-badge status-pending" style="font-size:11px;padding:4px 8px;">
+                                                {{ pickup.status }}
+                                            </span>
+                                        </td>
+                                        <td style="padding:12px;font-size:14px;color:#ef4444;font-weight:600;">
+                                            {{ missed_item.days_overdue }} day{% if missed_item.days_overdue != 1 %}s{% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <p>No missed pickups. Great job!</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Pickups by Category Table -->
+                    <div class="content-card" style="grid-column: 1 / -1;">
+                        <div class="card-header">
+                            <h2 class="card-title">Pickups by Waste Category</h2>
+                        </div>
+                        {% if pickups_by_category %}
+                        <div style="overflow-x:auto;">
+                            <table class="data-table" style="width:100%;border-collapse:collapse;">
+                                <thead>
+                                    <tr style="background:#f9fafb;border-bottom:2px solid #e5e7eb;">
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Waste Category</th>
+                                        <th style="padding:12px;text-align:center;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Total</th>
+                                        <th style="padding:12px;text-align:center;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Pending</th>
+                                        <th style="padding:12px;text-align:center;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Scheduled</th>
+                                        <th style="padding:12px;text-align:center;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">In Progress</th>
+                                        <th style="padding:12px;text-align:center;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Completed</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for category in pickups_by_category %}
+                                    <tr style="border-bottom:1px solid #e5e7eb;">
+                                        <td style="padding:12px;font-size:14px;color:#111827;font-weight:600;">{{ category.waste_category__name }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;text-align:center;font-weight:600;">{{ category.total }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;text-align:center;">{{ category.pending }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;text-align:center;">{{ category.scheduled }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;text-align:center;">{{ category.in_progress }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#059669;text-align:center;font-weight:600;">{{ category.completed }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <p>No pickup data by category.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if current_page == 'dashboard' or current_page == 'quick_actions' %}
+                    <div class="content-card" id="quick-actions-section" style="margin-top:18px;">
+                        <div class="card-header">
+                            <h2 class="card-title">Quick Actions</h2>
+                        </div>
+                        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
+                            <a href="/admin/" class="btn-primary text-center" style="padding:8px 10px;border-radius:9999px;background:#059669;color:white;font-size:13px;font-weight:600;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;">
+                                <i class="fas fa-cog"></i><span>Admin Panel</span>
+                            </a>
+                            <a href="/admin/registration/household/" class="btn-primary text-center" style="padding:8px 10px;border-radius:9999px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:white;font-size:13px;font-weight:600;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;">
+                                <i class="fas fa-users"></i><span>Manage Households</span>
+                            </a>
+                            <a href="/admin/registration/collector/" class="btn-primary text-center" style="padding:8px 10px;border-radius:9999px;background:linear-gradient(135deg,#eab308,#ca8a04);color:white;font-size:13px;font-weight:600;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;">
+                                <i class="fas fa-truck"></i><span>Manage Collectors</span>
+                            </a>
+                        </div>
+                </div>
+                {% endif %}
+            </div>
+            
+                <!-- Right: users -->
+                <div style="display:flex;flex-direction:column;gap:18px;">
+                    {% if current_page == 'dashboard' %}
+                    <div class="content-card" id="households-section">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Households</h2>
+                </div>
+                {% if recent_households %}
+                        <div style="display:flex;flex-direction:column;gap:10px;">
+                    {% for household in recent_households %}
+                            <div style="border-radius:10px;border:1px solid #e5e7eb;border-left:4px solid #2563eb;padding:10px 12px;background:#f9fafb;">
+                                <p style="font-weight:600;color:#111827;font-size:14px;margin-bottom:2px;">
+                                    {% if household.user.first_name %}{{ household.user.first_name }} {{ household.user.last_name }}{% else %}{{ household.user.username }}{% endif %}
+                                </p>
+                                <p style="font-size:13px;color:#4b5563;margin-bottom:2px;">
+                                    <i class="fas fa-envelope mr-1"></i>{{ household.user.email }}
+                                </p>
+                                <p style="font-size:12px;color:#6b7280;">
+                                    <i class="fas fa-calendar mr-1"></i>{{ household.created_at|date('M d, Y') }}
+                                </p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                            <p>No recent households</p>
+                </div>
+                {% endif %}
+            </div>
+                    {% endif %}
+                    
+                    {% if current_page == 'households' %}
+                    <div class="content-card" id="households-section" style="grid-column: 1 / -1;">
+                        <div class="card-header">
+                            <h2 class="card-title">All Households</h2>
+                            <span style="font-size:13px;color:#6b7280;">{{ all_households|length }} household{% if all_households|length != 1 %}s{% endif %}</span>
+                        </div>
+                        
+                        <!-- Filter Section -->
+                        <div style="margin-bottom:20px;padding:16px;background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;">
+                            <form method="GET" action="{{ url('registration:admin_households') }}" id="household-filter-form" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;align-items:end;">
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Province</label>
+                                    <select name="province" id="household-filter-province" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:white;">
+                                        <option value="">All Provinces</option>
+                                        {% for province in all_provinces %}
+                                        <option value="{{ province.id }}" {% if selected_province == province.id|string %}selected{% endif %}>{{ province.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">District</label>
+                                    <select name="district" id="household-filter-district" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:white;">
+                                        <option value="">All Districts</option>
+                                        {% for district in districts %}
+                                        <option value="{{ district.id }}" {% if selected_district == district.id|string %}selected{% endif %}>{{ district.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Sector</label>
+                                    <select name="sector" id="household-filter-sector" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:white;">
+                                        <option value="">All Sectors</option>
+                                        {% for sector in sectors %}
+                                        <option value="{{ sector.id }}" {% if selected_sector == sector.id|string %}selected{% endif %}>{{ sector.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Cell</label>
+                                    <select name="cell" id="household-filter-cell" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:white;">
+                                        <option value="">All Cells</option>
+                                        {% for cell in cells %}
+                                        <option value="{{ cell.id }}" {% if selected_cell == cell.id|string %}selected{% endif %}>{{ cell.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Village</label>
+                                    <select name="village" id="household-filter-village" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:white;">
+                                        <option value="">All Villages</option>
+                                        {% for village in villages %}
+                                        <option value="{{ village.id }}" {% if selected_village == village.id|string %}selected{% endif %}>{{ village.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <button type="submit" style="width:100%;padding:8px 16px;background:#059669;color:white;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;">
+                                        <i class="fas fa-filter mr-1"></i>Filter
+                                    </button>
+                                </div>
+                                {% if selected_province or selected_district or selected_sector or selected_cell or selected_village %}
+                                <div>
+                                    <a href="{{ url('registration:admin_households') }}" style="display:block;width:100%;padding:8px 16px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:600;font-size:14px;text-align:center;text-decoration:none;">
+                                        <i class="fas fa-times mr-1"></i>Clear
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </form>
+                        </div>
+                        
+                        <!-- Households Table -->
+                        {% if all_households %}
+                        <div style="overflow-x:auto;">
+                            <table class="data-table" style="width:100%;border-collapse:collapse;">
+                                <thead>
+                                    <tr style="background:#f9fafb;border-bottom:2px solid #e5e7eb;">
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Name</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Email</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Phone</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Province</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">District</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Sector</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Cell</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Village</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for household in all_households %}
+                                    <tr style="border-bottom:1px solid #e5e7eb;">
+                                        <td style="padding:12px;font-size:14px;color:#111827;">
+                                            {% if household.user.first_name %}{{ household.user.first_name }} {{ household.user.last_name }}{% else %}{{ household.user.username }}{% endif %}
+                                        </td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">{{ household.user.email }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">{{ household.phone_number }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">
+                                            {% if household.province %}{{ household.province.name }}{% else %}<span style="color:#9ca3af;">-</span>{% endif %}
+                                        </td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">
+                                            {% if household.district %}{{ household.district.name }}{% else %}<span style="color:#9ca3af;">-</span>{% endif %}
+                                        </td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">
+                                            {% if household.sector %}{{ household.sector.name }}{% else %}<span style="color:#9ca3af;">-</span>{% endif %}
+                                        </td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">
+                                            {% if household.cell %}{{ household.cell.name }}{% else %}<span style="color:#9ca3af;">-</span>{% endif %}
+                                        </td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">
+                                            {% if household.village %}{{ household.village.name }}{% else %}<span style="color:#9ca3af;">-</span>{% endif %}
+                                        </td>
+                                        <td style="padding:12px;">
+                                            <span class="status-badge {% if household.is_verified %}status-completed{% else %}status-pending{% endif %}" style="font-size:11px;padding:4px 8px;">
+                                                {% if household.is_verified %}Verified{% else %}Unverified{% endif %}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <p>No households found matching the selected filters.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if current_page == 'dashboard' %}
+                    <div class="content-card" id="collectors-section">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Collectors</h2>
+                </div>
+                {% if recent_collectors %}
+                        <div style="display:flex;flex-direction:column;gap:10px;">
+                    {% for collector in recent_collectors %}
+                            <div style="border-radius:10px;border:1px solid #e5e7eb;border-left:4px solid #eab308;padding:10px 12px;background:#f9fafb;">
+                                <p style="font-weight:600;color:#111827;font-size:14px;margin-bottom:2px;">
+                                    {% if collector.user.first_name %}{{ collector.user.first_name }} {{ collector.user.last_name }}{% else %}{{ collector.user.username }}{% endif %}
+                                </p>
+                                <p style="font-size:13px;color:#4b5563;margin-bottom:2px;">
+                                    <i class="fas fa-envelope mr-1"></i>{{ collector.user.email }}
+                                </p>
+                                <p style="font-size:12px;color:#6b7280;">
+                                    <i class="fas fa-calendar mr-1"></i>{{ collector.created_at|date('M d, Y') }}
+                                </p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                            <p>No recent collectors</p>
+                </div>
+                {% endif %}
+            </div>
+                    {% endif %}
+                    
+                    {% if current_page == 'collectors' %}
+                    <div class="content-card" id="collectors-section" style="grid-column: 1 / -1;">
+                        <div class="card-header">
+                            <h2 class="card-title">All Collectors</h2>
+                            <span style="font-size:13px;color:#6b7280;">{{ all_collectors|length }} collector{% if all_collectors|length != 1 %}s{% endif %}</span>
+        </div>
+        
+                        <!-- Filter Section -->
+                        <div style="margin-bottom:20px;padding:16px;background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;">
+                            <form method="GET" action="{{ url('registration:admin_collectors') }}" id="collector-filter-form" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;align-items:end;">
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Province</label>
+                                    <select name="province" id="filter-province" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:white;">
+                                        <option value="">All Provinces</option>
+                                        {% for province in all_provinces %}
+                                        <option value="{{ province.id }}" {% if selected_province == province.id|string %}selected{% endif %}>{{ province.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">District</label>
+                                    <select name="district" id="filter-district" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:white;">
+                                        <option value="">All Districts</option>
+                                        {% for district in districts %}
+                                        <option value="{{ district.id }}" {% if selected_district == district.id|string %}selected{% endif %}>{{ district.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Sector</label>
+                                    <select name="sector" id="filter-sector" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:white;">
+                                        <option value="">All Sectors</option>
+                                        {% for sector in sectors %}
+                                        <option value="{{ sector.id }}" {% if selected_sector == sector.id|string %}selected{% endif %}>{{ sector.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Cell</label>
+                                    <select name="cell" id="filter-cell" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:white;">
+                                        <option value="">All Cells</option>
+                                        {% for cell in cells %}
+                                        <option value="{{ cell.id }}" {% if selected_cell == cell.id|string %}selected{% endif %}>{{ cell.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">Village</label>
+                                    <select name="village" id="filter-village" style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;background:white;">
+                                        <option value="">All Villages</option>
+                                        {% for village in villages %}
+                                        <option value="{{ village.id }}" {% if selected_village == village.id|string %}selected{% endif %}>{{ village.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                </div>
+                                <div>
+                                    <button type="submit" style="width:100%;padding:8px 16px;background:#059669;color:white;border:none;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;">
+                                        <i class="fas fa-filter mr-1"></i>Filter
+                                    </button>
+            </div>
+                                {% if selected_province or selected_district or selected_sector or selected_cell or selected_village %}
+                                <div>
+                                    <a href="{{ url('registration:admin_collectors') }}" style="display:block;width:100%;padding:8px 16px;background:#ef4444;color:white;border:none;border-radius:8px;font-weight:600;font-size:14px;text-align:center;text-decoration:none;">
+                                        <i class="fas fa-times mr-1"></i>Clear
+                </a>
+            </div>
+                                {% endif %}
+                            </form>
+                        </div>
+                        
+                        <!-- Collectors Table -->
+                        {% if all_collectors %}
+                        <div style="overflow-x:auto;">
+                            <table class="data-table" style="width:100%;border-collapse:collapse;">
+                                <thead>
+                                    <tr style="background:#f9fafb;border-bottom:2px solid #e5e7eb;">
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Name</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Email</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Phone</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Province</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">District</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">License</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Vehicle</th>
+                                        <th style="padding:12px;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for collector in all_collectors %}
+                                    <tr style="border-bottom:1px solid #e5e7eb;">
+                                        <td style="padding:12px;font-size:14px;color:#111827;">
+                                            {% if collector.user.first_name %}{{ collector.user.first_name }} {{ collector.user.last_name }}{% else %}{{ collector.user.username }}{% endif %}
+                                        </td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">{{ collector.user.email }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">{{ collector.phone_number }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">
+                                            {% if collector.province %}{{ collector.province.name }}{% else %}<span style="color:#9ca3af;">-</span>{% endif %}
+                                        </td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">
+                                            {% if collector.district %}{{ collector.district.name }}{% else %}<span style="color:#9ca3af;">-</span>{% endif %}
+                                        </td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">
+                                            {% if collector.license_number %}{{ collector.license_number }}{% else %}<span style="color:#9ca3af;">-</span>{% endif %}
+                                        </td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">
+                                            {% if collector.vehicle_number %}{{ collector.vehicle_number }}{% else %}<span style="color:#9ca3af;">-</span>{% endif %}
+                                        </td>
+                                        <td style="padding:12px;">
+                                            <span class="status-badge {% if collector.is_available %}status-completed{% else %}status-pending{% endif %}" style="font-size:11px;padding:4px 8px;">
+                                                {% if collector.is_available %}Available{% else %}Unavailable{% endif %}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <p>No collectors found matching the selected filters.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+        </div>
+    </div>
+</div>
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const profileToggle = document.getElementById('admin-profile-toggle');
+        const profileDropdown = document.getElementById('admin-profile-dropdown');
+
+        if (profileToggle && profileDropdown) {
+            profileToggle.addEventListener('click', function (e) {
+                e.stopPropagation();
+                profileDropdown.style.display =
+                    profileDropdown.style.display === 'none' || profileDropdown.style.display === ''
+                        ? 'block'
+                        : 'none';
+            });
+            document.addEventListener('click', function () {
+                profileDropdown.style.display = 'none';
+            });
+            profileDropdown.addEventListener('click', function (e) {
+                e.stopPropagation();
+            });
+        }
+
+        // Cascading dropdowns for collector filters
+        const provinceSelect = document.getElementById('filter-province');
+        const districtSelect = document.getElementById('filter-district');
+        const sectorSelect = document.getElementById('filter-sector');
+        const cellSelect = document.getElementById('filter-cell');
+        const villageSelect = document.getElementById('filter-village');
+
+        function clearSelect(select) {
+            if (select) {
+                select.innerHTML = '<option value="">All ' + select.previousElementSibling.textContent.replace(':', '') + '</option>';
+            }
+        }
+
+        function loadDistricts(provinceId) {
+            if (!provinceId) {
+                clearSelect(districtSelect);
+                clearSelect(sectorSelect);
+                clearSelect(cellSelect);
+                clearSelect(villageSelect);
+                return;
+            }
+            fetch('{{ url("registration:get_districts") }}?province_id=' + provinceId)
+                .then(response => response.json())
+                .then(data => {
+                    clearSelect(districtSelect);
+                    clearSelect(sectorSelect);
+                    clearSelect(cellSelect);
+                    clearSelect(villageSelect);
+                    if (data.districts) {
+                        data.districts.forEach(district => {
+                            const option = document.createElement('option');
+                            option.value = district.id;
+                            option.textContent = district.name;
+                            districtSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading districts:', error));
+        }
+
+        function loadSectors(districtId) {
+            if (!districtId) {
+                clearSelect(sectorSelect);
+                clearSelect(cellSelect);
+                clearSelect(villageSelect);
+                return;
+            }
+            fetch('{{ url("registration:get_sectors") }}?district_id=' + districtId)
+                .then(response => response.json())
+                .then(data => {
+                    clearSelect(sectorSelect);
+                    clearSelect(cellSelect);
+                    clearSelect(villageSelect);
+                    if (data.sectors) {
+                        data.sectors.forEach(sector => {
+                            const option = document.createElement('option');
+                            option.value = sector.id;
+                            option.textContent = sector.name;
+                            sectorSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading sectors:', error));
+        }
+
+        function loadCells(sectorId) {
+            if (!sectorId) {
+                clearSelect(cellSelect);
+                clearSelect(villageSelect);
+                return;
+            }
+            fetch('{{ url("registration:get_cells") }}?sector_id=' + sectorId)
+                .then(response => response.json())
+                .then(data => {
+                    clearSelect(cellSelect);
+                    clearSelect(villageSelect);
+                    if (data.cells) {
+                        data.cells.forEach(cell => {
+                            const option = document.createElement('option');
+                            option.value = cell.id;
+                            option.textContent = cell.name;
+                            cellSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading cells:', error));
+        }
+
+        function loadVillages(cellId) {
+            if (!cellId) {
+                clearSelect(villageSelect);
+                return;
+            }
+            fetch('{{ url("registration:get_villages") }}?cell_id=' + cellId)
+                .then(response => response.json())
+                .then(data => {
+                    clearSelect(villageSelect);
+                    if (data.villages) {
+                        data.villages.forEach(village => {
+                            const option = document.createElement('option');
+                            option.value = village.id;
+                            option.textContent = village.name;
+                            villageSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading villages:', error));
+        }
+
+        if (provinceSelect) {
+            provinceSelect.addEventListener('change', function () {
+                loadDistricts(this.value);
+            });
+        }
+
+        if (districtSelect) {
+            districtSelect.addEventListener('change', function () {
+                loadSectors(this.value);
+            });
+        }
+
+        if (sectorSelect) {
+            sectorSelect.addEventListener('change', function () {
+                loadCells(this.value);
+            });
+        }
+
+        if (cellSelect) {
+            cellSelect.addEventListener('change', function () {
+                loadVillages(this.value);
+            });
+        }
+
+        // Cascading dropdowns for household filters
+        const householdProvinceSelect = document.getElementById('household-filter-province');
+        const householdDistrictSelect = document.getElementById('household-filter-district');
+        const householdSectorSelect = document.getElementById('household-filter-sector');
+        const householdCellSelect = document.getElementById('household-filter-cell');
+        const householdVillageSelect = document.getElementById('household-filter-village');
+
+        function clearHouseholdSelect(select) {
+            if (select) {
+                select.innerHTML = '<option value="">All ' + select.previousElementSibling.textContent.replace(':', '') + '</option>';
+            }
+        }
+
+        function loadHouseholdDistricts(provinceId) {
+            if (!provinceId) {
+                clearHouseholdSelect(householdDistrictSelect);
+                clearHouseholdSelect(householdSectorSelect);
+                clearHouseholdSelect(householdCellSelect);
+                clearHouseholdSelect(householdVillageSelect);
+                return;
+            }
+            fetch('{{ url("registration:get_districts") }}?province_id=' + provinceId)
+                .then(response => response.json())
+                .then(data => {
+                    clearHouseholdSelect(householdDistrictSelect);
+                    clearHouseholdSelect(householdSectorSelect);
+                    clearHouseholdSelect(householdCellSelect);
+                    clearHouseholdSelect(householdVillageSelect);
+                    if (data.districts) {
+                        data.districts.forEach(district => {
+                            const option = document.createElement('option');
+                            option.value = district.id;
+                            option.textContent = district.name;
+                            householdDistrictSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading districts:', error));
+        }
+
+        function loadHouseholdSectors(districtId) {
+            if (!districtId) {
+                clearHouseholdSelect(householdSectorSelect);
+                clearHouseholdSelect(householdCellSelect);
+                clearHouseholdSelect(householdVillageSelect);
+                return;
+            }
+            fetch('{{ url("registration:get_sectors") }}?district_id=' + districtId)
+                .then(response => response.json())
+                .then(data => {
+                    clearHouseholdSelect(householdSectorSelect);
+                    clearHouseholdSelect(householdCellSelect);
+                    clearHouseholdSelect(householdVillageSelect);
+                    if (data.sectors) {
+                        data.sectors.forEach(sector => {
+                            const option = document.createElement('option');
+                            option.value = sector.id;
+                            option.textContent = sector.name;
+                            householdSectorSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading sectors:', error));
+        }
+
+        function loadHouseholdCells(sectorId) {
+            if (!sectorId) {
+                clearHouseholdSelect(householdCellSelect);
+                clearHouseholdSelect(householdVillageSelect);
+                return;
+            }
+            fetch('{{ url("registration:get_cells") }}?sector_id=' + sectorId)
+                .then(response => response.json())
+                .then(data => {
+                    clearHouseholdSelect(householdCellSelect);
+                    clearHouseholdSelect(householdVillageSelect);
+                    if (data.cells) {
+                        data.cells.forEach(cell => {
+                            const option = document.createElement('option');
+                            option.value = cell.id;
+                            option.textContent = cell.name;
+                            householdCellSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading cells:', error));
+        }
+
+        function loadHouseholdVillages(cellId) {
+            if (!cellId) {
+                clearHouseholdSelect(householdVillageSelect);
+                return;
+            }
+            fetch('{{ url("registration:get_villages") }}?cell_id=' + cellId)
+                .then(response => response.json())
+                .then(data => {
+                    clearHouseholdSelect(householdVillageSelect);
+                    if (data.villages) {
+                        data.villages.forEach(village => {
+                            const option = document.createElement('option');
+                            option.value = village.id;
+                            option.textContent = village.name;
+                            householdVillageSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading villages:', error));
+        }
+
+        if (householdProvinceSelect) {
+            householdProvinceSelect.addEventListener('change', function () {
+                loadHouseholdDistricts(this.value);
+            });
+        }
+
+        if (householdDistrictSelect) {
+            householdDistrictSelect.addEventListener('change', function () {
+                loadHouseholdSectors(this.value);
+            });
+        }
+
+        if (householdSectorSelect) {
+            householdSectorSelect.addEventListener('change', function () {
+                loadHouseholdCells(this.value);
+            });
+        }
+
+        if (householdCellSelect) {
+            householdCellSelect.addEventListener('change', function () {
+                loadHouseholdVillages(this.value);
+            });
+        }
+
+        // Cascading dropdowns for pickup filters
+        const pickupProvinceSelect = document.getElementById('pickup-filter-province');
+        const pickupDistrictSelect = document.getElementById('pickup-filter-district');
+
+        function clearPickupSelect(select) {
+            if (select) {
+                select.innerHTML = '<option value="">All ' + select.previousElementSibling.textContent.replace(':', '') + '</option>';
+            }
+        }
+
+        function loadPickupDistricts(provinceId) {
+            if (!provinceId) {
+                clearPickupSelect(pickupDistrictSelect);
+                return;
+            }
+            fetch('{{ url("registration:get_districts") }}?province_id=' + provinceId)
+                .then(response => response.json())
+                .then(data => {
+                    clearPickupSelect(pickupDistrictSelect);
+                    if (data.districts) {
+                        data.districts.forEach(district => {
+                            const option = document.createElement('option');
+                            option.value = district.id;
+                            option.textContent = district.name;
+                            pickupDistrictSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading districts:', error));
+        }
+
+        if (pickupProvinceSelect) {
+            pickupProvinceSelect.addEventListener('change', function () {
+                loadPickupDistricts(this.value);
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+

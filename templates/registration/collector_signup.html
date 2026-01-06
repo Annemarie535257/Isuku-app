@@ -1,0 +1,588 @@
+{% extends "base.html" %}
+
+{% block title %}Collector Signup - Isuku{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-title {
+        color: #000;
+        font-weight: bold;
+        font-size: 24px;
+        text-transform: uppercase;
+        text-align: center;
+        margin-bottom: 24px;
+    }
+    .signup-panel {
+        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 50%, #ecfdf5 100%);
+        border: 2px solid #059669;
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 8px 24px rgba(5, 150, 105, 0.15);
+    }
+    .logo-inside {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 32px;
+    }
+    .logo-inside img {
+        height: 100px !important;
+        width: auto;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    }
+    .logo-text-white {
+        font-size: 32px;
+        font-weight: bold;
+        color: #059669;
+        letter-spacing: 2px;
+        font-family: Arial, sans-serif;
+    }
+    .logo-trash-white {
+        color: #059669;
+        font-size: 28px;
+        vertical-align: baseline;
+        margin: 0 2px;
+    }
+    .panel-title {
+        color: #059669;
+        font-weight: bold;
+        font-size: 28px;
+        text-transform: uppercase;
+        text-align: center;
+        margin-bottom: 24px;
+        letter-spacing: 1px;
+    }
+    .form-label {
+        color: #047857;
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .form-input {
+        width: 100%;
+        padding: 12px;
+        background-color: white;
+        border: 2px solid #d1fae5;
+        border-radius: 8px;
+        color: #333;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    .form-input::placeholder {
+        color: #999;
+    }
+    .form-input:focus {
+        outline: none;
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+    }
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    .form-row-single {
+        margin-bottom: 16px;
+    }
+    .submit-button {
+        width: 100%;
+        padding: 14px;
+        background-color: #059669;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 16px;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    }
+    .submit-button:hover {
+        background-color: #047857;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(5, 150, 105, 0.4);
+    }
+    .switch-link {
+        color: #047857;
+        text-align: center;
+        margin-top: 16px;
+        font-size: 14px;
+    }
+    .switch-link a {
+        color: #059669;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-decoration: none;
+    }
+    .switch-link a:hover {
+        color: #047857;
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl w-full">
+        <!-- Page Title -->
+        <h1 class="page-title" data-translate="COLLECTORS">COLLECTORS</h1>
+        
+        <div class="signup-panel">
+            <!-- Logo inside panel -->
+            <div class="logo-inside">
+                <img src="{{ static('images/logo 1.png') }}" alt="Isuku Logo" class="h-24 w-auto" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="flex items-center" style="display:none;">
+                    <span class="logo-text-white">is</span>
+                    <i class="fas fa-trash-alt logo-trash-white"></i>
+                    <span class="logo-text-white">ku</span>
+                </div>
+            </div>
+            
+            <h2 class="panel-title" data-translate="SIGNUP">SIGNUP</h2>
+            
+            {% if messages %}
+            <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                {% for message in messages %}
+                <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <form method="POST">
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                
+                <!-- Full Name - Single Row -->
+                <div class="form-row-single">
+                    <label class="form-label" data-translate="Full name:">Full name:</label>
+                    <input type="text" name="full_name" required class="form-input">
+                </div>
+                
+                <!-- Email and Phone Number - Side by Side -->
+                <div class="form-row">
+                    <div>
+                        <label class="form-label" data-translate="Email:">Email:</label>
+                        <input type="email" name="email" required class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label" data-translate="Phone Number:">Phone Number:</label>
+                        <input type="tel" name="phone_number" id="phone_number" required class="form-input" placeholder="0788888888 or +250788888888">
+                        <small style="color: #666; font-size: 12px; display: block; margin-top: 4px;" data-translate="Click 'Verify Phone Number' button to receive OTP">Click 'Verify Phone Number' button to receive OTP</small>
+                    </div>
+                </div>
+                
+                <!-- License Number and Vehicle Number - Side by Side -->
+                <div class="form-row">
+                    <div>
+                        <label class="form-label" data-translate="License Number:">License Number:</label>
+                        <input type="text" name="license_number" class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label" data-translate="Vehicle Number:">Vehicle Number:</label>
+                        <input type="text" name="vehicle_number" class="form-input">
+                    </div>
+                </div>
+                
+                <!-- Password and Confirm Password - Side by Side -->
+                <div class="form-row">
+                    <div>
+                        <label class="form-label" data-translate="Password:">Password:</label>
+                        <input type="password" name="password" required class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label" data-translate="Confirm Password:">Confirm Password:</label>
+                        <input type="password" name="confirm_password" required class="form-input">
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-button" data-translate="SIGNUP">SIGNUP</button>
+                
+                <p class="switch-link">
+                    <span data-translate="Already have an account?">Already have an account?</span> <a href="{{ url('registration:collector_login') }}" data-translate="LOGIN">LOGIN</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// OTP Verification Modal for Collector Signup
+document.addEventListener('DOMContentLoaded', function() {
+    const phoneInput = document.querySelector('input[name="phone_number"]');
+    const form = document.querySelector('form');
+    let otpVerified = false;
+    let otpCode = '';
+    let currentPhoneNumber = '';
+    
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Create OTP Modal (same as household signup)
+    const otpModal = document.createElement('div');
+    otpModal.id = 'otp-modal';
+    otpModal.style.cssText = `
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 10000;
+        justify-content: center;
+        align-items: center;
+    `;
+    otpModal.innerHTML = `
+        <div style="background: white; padding: 40px; border-radius: 16px; max-width: 450px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); position: relative;">
+            <button id="close-otp-modal" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-mobile-alt" style="font-size: 40px; color: #059669;"></i>
+                </div>
+                <h2 style="color: #059669; margin-bottom: 10px; font-size: 24px;" data-translate="Verify Your Phone Number">Verify Your Phone Number</h2>
+                <p id="otp-phone-display" style="color: #666; margin-bottom: 5px; font-size: 16px;"></p>
+                <p style="color: #999; font-size: 14px;" data-translate="Enter the 6-digit code sent to your phone">Enter the 6-digit code sent to your phone</p>
+            </div>
+            <div id="otp-inputs-container" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
+                <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" style="width: 50px; height: 60px; text-align: center; font-size: 24px; font-weight: bold; border: 2px solid #d1fae5; border-radius: 8px; outline: none; transition: all 0.3s;">
+                <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" style="width: 50px; height: 60px; text-align: center; font-size: 24px; font-weight: bold; border: 2px solid #d1fae5; border-radius: 8px; outline: none; transition: all 0.3s;">
+                <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" style="width: 50px; height: 60px; text-align: center; font-size: 24px; font-weight: bold; border: 2px solid #d1fae5; border-radius: 8px; outline: none; transition: all 0.3s;">
+                <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" style="width: 50px; height: 60px; text-align: center; font-size: 24px; font-weight: bold; border: 2px solid #d1fae5; border-radius: 8px; outline: none; transition: all 0.3s;">
+                <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" style="width: 50px; height: 60px; text-align: center; font-size: 24px; font-weight: bold; border: 2px solid #d1fae5; border-radius: 8px; outline: none; transition: all 0.3s;">
+                <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" style="width: 50px; height: 60px; text-align: center; font-size: 24px; font-weight: bold; border: 2px solid #d1fae5; border-radius: 8px; outline: none; transition: all 0.3s;">
+            </div>
+            <div id="otp-modal-message" style="text-align: center; margin-bottom: 20px; min-height: 20px; font-size: 14px;"></div>
+            <div style="display: flex; gap: 10px;">
+                <button id="verify-otp-btn" style="flex: 1; padding: 14px; background: #059669; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.3s;" data-translate="Verify">Verify</button>
+                <button id="resend-otp-btn" style="padding: 14px 20px; background: #ecfdf5; color: #059669; border: 2px solid #059669; border-radius: 8px; font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.3s; white-space: nowrap;" data-translate="Resend">Resend</button>
+            </div>
+            <div id="otp-code-display" style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; text-align: center; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <p style="margin: 0 0 10px 0; font-size: 14px; color: #92400e; font-weight: 600;">
+                    <strong data-translate="Your OTP Code">Your OTP Code</strong>
+                </p>
+                <p id="otp-display-code" style="margin: 0; font-size: 32px; font-weight: bold; color: #059669; font-family: 'Courier New', monospace; letter-spacing: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.1);"></p>
+                <p style="margin: 10px 0 0 0; font-size: 12px; color: #78350f;" data-translate="Enter this code in the fields above">Enter this code in the fields above</p>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(otpModal);
+    
+    // Add styles for OTP inputs
+    const style = document.createElement('style');
+    style.textContent = `
+        .otp-digit:focus {
+            border-color: #059669 !important;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1) !important;
+            transform: scale(1.05);
+        }
+        .otp-digit.filled {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+        .otp-digit.error {
+            border-color: #dc2626;
+            background: #fef2f2;
+            animation: shake 0.3s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    const otpInputs = otpModal.querySelectorAll('.otp-digit');
+    
+    // Handle OTP digit input
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('input', function(e) {
+            const value = this.value.replace(/[^0-9]/g, '');
+            this.value = value;
+            if (value && index < otpInputs.length - 1) {
+                otpInputs[index + 1].focus();
+            }
+            this.classList.remove('error');
+            if (value) {
+                this.classList.add('filled');
+            } else {
+                this.classList.remove('filled');
+            }
+        });
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && !this.value && index > 0) {
+                otpInputs[index - 1].focus();
+            }
+        });
+        input.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+            pastedData.split('').forEach((digit, i) => {
+                if (otpInputs[index + i]) {
+                    otpInputs[index + i].value = digit;
+                    otpInputs[index + i].classList.add('filled');
+                }
+            });
+            if (pastedData.length === 6) {
+                otpInputs[5].focus();
+            }
+        });
+    });
+    
+    function showOTPModal(phoneNumber, otpCode = null) {
+        currentPhoneNumber = phoneNumber;
+        document.getElementById('otp-phone-display').textContent = phoneNumber;
+        otpModal.style.display = 'flex';
+        otpInputs[0].focus();
+        otpInputs.forEach(input => {
+            input.value = '';
+            input.classList.remove('filled', 'error');
+        });
+        document.getElementById('otp-modal-message').textContent = '';
+        // Show OTP code if provided
+        if (otpCode) {
+            document.getElementById('otp-code-display').style.display = 'block';
+            document.getElementById('otp-display-code').textContent = otpCode;
+        } else {
+            document.getElementById('otp-code-display').style.display = 'none';
+        }
+    }
+    
+    function hideOTPModal() {
+        otpModal.style.display = 'none';
+    }
+    
+    document.getElementById('close-otp-modal').addEventListener('click', hideOTPModal);
+    otpModal.addEventListener('click', function(e) {
+        if (e.target === otpModal) {
+            hideOTPModal();
+        }
+    });
+    
+    document.getElementById('verify-otp-btn').addEventListener('click', function() {
+        const code = Array.from(otpInputs).map(input => input.value).join('');
+        if (code.length !== 6) {
+            document.getElementById('otp-modal-message').textContent = 'Please enter all 6 digits';
+            document.getElementById('otp-modal-message').style.color = '#dc2626';
+            otpInputs.forEach(input => {
+                if (!input.value) {
+                    input.classList.add('error');
+                }
+            });
+            return;
+        }
+        this.disabled = true;
+        this.textContent = 'Verifying...';
+        const messageDiv = document.getElementById('otp-modal-message');
+        fetch('{{ url("registration:verify_otp") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                otp: code,
+                phoneNumber: currentPhoneNumber
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                otpVerified = true;
+                otpCode = code;
+                messageDiv.textContent = '✓ ' + data.message;
+                messageDiv.style.color = '#059669';
+                const hiddenOtpInput = document.createElement('input');
+                hiddenOtpInput.type = 'hidden';
+                hiddenOtpInput.name = 'otp_code';
+                hiddenOtpInput.value = otpCode;
+                form.appendChild(hiddenOtpInput);
+                const hiddenVerifiedInput = document.createElement('input');
+                hiddenVerifiedInput.type = 'hidden';
+                hiddenVerifiedInput.name = 'otp_verified';
+                hiddenVerifiedInput.value = 'true';
+                form.appendChild(hiddenVerifiedInput);
+                setTimeout(() => {
+                    hideOTPModal();
+                    if (phoneInput.nextElementSibling && !phoneInput.nextElementSibling.classList.contains('otp-verified-indicator')) {
+                        const indicator = document.createElement('span');
+                        indicator.className = 'otp-verified-indicator';
+                        indicator.innerHTML = ' ✓ Verified';
+                        indicator.style.color = '#059669';
+                        indicator.style.fontSize = '14px';
+                        indicator.style.marginLeft = '10px';
+                        phoneInput.parentNode.insertBefore(indicator, phoneInput.nextSibling);
+                    }
+                }, 1000);
+            } else {
+                otpVerified = false;
+                messageDiv.textContent = data.message;
+                messageDiv.style.color = '#dc2626';
+                otpInputs.forEach(input => input.classList.add('error'));
+                setTimeout(() => {
+                    otpInputs.forEach(input => {
+                        input.value = '';
+                        input.classList.remove('filled', 'error');
+                    });
+                    otpInputs[0].focus();
+                }, 1000);
+            }
+            this.disabled = false;
+            this.textContent = 'Verify';
+        })
+        .catch(error => {
+            console.error('Error verifying OTP:', error);
+            messageDiv.textContent = 'Error verifying OTP. Please try again.';
+            messageDiv.style.color = '#dc2626';
+            this.disabled = false;
+            this.textContent = 'Verify';
+        });
+    });
+    
+    document.getElementById('resend-otp-btn').addEventListener('click', function() {
+        this.disabled = true;
+        this.textContent = 'Sending...';
+        const messageDiv = document.getElementById('otp-modal-message');
+        messageDiv.textContent = '';
+        fetch('{{ url("registration:resend_otp") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                phoneNumber: currentPhoneNumber
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                messageDiv.textContent = 'OTP sent successfully!';
+                messageDiv.style.color = '#059669';
+                
+                // Show OTP code if provided
+                if (data.otp) {
+                    document.getElementById('otp-code-display').style.display = 'block';
+                    document.getElementById('otp-display-code').textContent = data.otp;
+                }
+                
+                otpInputs.forEach(input => {
+                    input.value = '';
+                    input.classList.remove('filled', 'error');
+                });
+                otpInputs[0].focus();
+            } else {
+                messageDiv.textContent = data.message;
+                messageDiv.style.color = '#dc2626';
+            }
+            this.disabled = false;
+            this.textContent = 'Resend';
+        })
+        .catch(error => {
+            console.error('Error sending OTP:', error);
+            messageDiv.textContent = 'Error sending OTP. Please try again.';
+            messageDiv.style.color = '#dc2626';
+            this.disabled = false;
+            this.textContent = 'Resend';
+        });
+    });
+    
+    const phoneInputContainer = phoneInput.parentNode;
+    const verifyPhoneBtn = document.createElement('button');
+    verifyPhoneBtn.type = 'button';
+    verifyPhoneBtn.id = 'verify-phone-btn';
+    verifyPhoneBtn.className = 'submit-button';
+    verifyPhoneBtn.style.cssText = 'width: auto; padding: 12px 24px; margin-top: 8px;';
+    verifyPhoneBtn.innerHTML = '<i class="fas fa-shield-alt" style="margin-right: 5px;"></i><span data-translate="Verify Phone Number">Verify Phone Number</span>';
+    phoneInputContainer.appendChild(verifyPhoneBtn);
+    
+    verifyPhoneBtn.addEventListener('click', function() {
+        const phoneNumber = phoneInput.value.trim();
+        if (!phoneNumber) {
+            alert('Please enter a phone number first');
+            return;
+        }
+        let normalizedPhone = phoneNumber;
+        if (!normalizedPhone.startsWith('+')) {
+            if (normalizedPhone.startsWith('0')) {
+                normalizedPhone = '+250' + normalizedPhone.substring(1);
+            } else if (normalizedPhone.startsWith('250')) {
+                normalizedPhone = '+' + normalizedPhone;
+            } else {
+                normalizedPhone = '+250' + normalizedPhone;
+            }
+        }
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 5px;"></i>Sending...';
+        fetch('{{ url("registration:request_otp") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                phoneNumber: normalizedPhone
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                phoneInput.value = normalizedPhone;
+                showOTPModal(normalizedPhone, data.otp || null);
+            } else {
+                alert('Error: ' + (data.error || data.message));
+            }
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-shield-alt" style="margin-right: 5px;"></i><span data-translate="Verify Phone Number">Verify Phone Number</span>';
+        })
+        .catch(error => {
+            console.error('Error sending OTP:', error);
+            alert('Error sending OTP. Please try again.');
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-shield-alt" style="margin-right: 5px;"></i><span data-translate="Verify Phone Number">Verify Phone Number</span>';
+        });
+    });
+    
+    form?.addEventListener('submit', function(e) {
+        if (!otpVerified) {
+            e.preventDefault();
+            const phoneNumber = phoneInput.value.trim();
+            if (!phoneNumber) {
+                alert('Please enter a phone number first');
+                return false;
+            }
+            verifyPhoneBtn.click();
+            return false;
+        }
+    });
+    
+    otpInputs.forEach(input => {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const code = Array.from(otpInputs).map(i => i.value).join('');
+                if (code.length === 6) {
+                    document.getElementById('verify-otp-btn').click();
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

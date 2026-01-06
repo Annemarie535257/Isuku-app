@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Isuku - Waste Management System{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Clean, Professional Color Palette */
+        .green-primary { color: #059669; }
+        .bg-green-primary { background-color: #059669; }
+        .bg-green-light { background-color: #10b981; }
+        .bg-green-50 { background-color: #ecfdf5; }
+        .bg-green-100 { background-color: #d1fae5; }
+        .text-green-600 { color: #059669; }
+        .text-green-700 { color: #047857; }
+        .border-green { border-color: #059669; }
+        
+        /* Soft accent colors */
+        .bg-blue-50 { background-color: #eff6ff; }
+        .text-blue-600 { color: #2563eb; }
+        .bg-purple-50 { background-color: #f5f3ff; }
+        .text-purple-600 { color: #9333ea; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50">
+    {% block content %}{% endblock %}
+    <script src="{{ static('js/translations.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

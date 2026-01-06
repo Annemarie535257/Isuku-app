@@ -1,0 +1,84 @@
+# Kinyarwanda translations for Isuku App
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: rw\n"
+
+msgid "HOME"
+msgstr "AYANZU"
+
+msgid "ABOUT US"
+msgstr "ABAFITE AMAKURU"
+
+msgid "SERVICES"
+msgstr "SERIVISI"
+
+msgid "CONTACT US"
+msgstr "TUHAMAGARE"
+
+msgid "LANGUAGE"
+msgstr "URURIMI"
+
+msgid "GET STARTED"
+msgstr "TANGIRA"
+
+msgid "Smart Waste Management"
+msgstr "Gucunga Imyanda Nubwenge"
+
+msgid "WASTE MANAGEMENT"
+msgstr "GUCUNGA IMYANDA"
+
+msgid "SYSTEM"
+msgstr "SISITEMU"
+
+msgid "We are committed to connecting households with waste collectors through sanitation technology, with the goal of sorting waste, managing it properly, and protecting the environment."
+msgstr "Twiyemeje guhuza amazu n'abakusanya imyanda binyuze mu teknoloji y'isuku, uburyo bwo gutondekanya imyanda, kuyigenzura neza, no kurinda ibidukikije."
+
+msgid "LEARN MORE"
+msgstr "MENYA BYINSHI"
+
+msgid "Households"
+msgstr "Amazu"
+
+msgid "Collectors"
+msgstr "Abakusanya"
+
+msgid "Pickups"
+msgstr "Gukusanya"
+
+msgid "Eco-Friendly"
+msgstr "Bidaharanira ibidukikije"
+
+msgid "Sustainable"
+msgstr "Bikomeye"
+
+msgid "About Us"
+msgstr "Abafite Amakuru"
+
+msgid "Leading the way in sustainable waste management solutions"
+msgstr "Dukurikiza inzira mu bibazo byo gukoresha neza imyanda"
+
+msgid "Our Mission"
+msgstr "Intego Zacu"
+
+msgid "Mission"
+msgstr "Intego"
+
+msgid "Our mission is to manage waste properly, encourage households to sort their waste, and protect the environment for a cleaner and sustainable future. We believe that every action counts in building a better world for generations to come."
+msgstr "Intego zacu ni ukuvura imyanda neza, gukwaza amazu guhitiramo gutondekanya imyanda yabo, no kurinda ibidukikije kugira ngo habe isi yoroshye kandi ikomeye. Twaremeye ko buri gikorwa gifite agaciro mu kwubaka isi nziza y'izabaho."
+
+msgid "Environmental Protection"
+msgstr "Kurinda Ibidukikije"
+
+msgid "Our Vision"
+msgstr "Intwariro Zacu"
+
+msgid "Vision"
+msgstr "Intwariro"
+
+msgid "Our vision is to create a world where waste is seen as a resource, where every household actively participates in sustainable waste management, and where our environment thrives for future generations."
+msgstr "Intwariro zacu ni gukora isi aho imyanda iboneka nk'umutungo, aho buri mazu agira uruhare mu gukoresha neza imyanda, kandi aho ibidukikije byacu bikomeza kugira amahirwe y'izabaho."
+
+msgid "Sustainability"
+msgstr "Kuguma"
+

@@ -1,0 +1,640 @@
+{% extends "base.html" %}
+
+{% block title %}Collector Dashboard - Isuku{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-wrapper {
+        display: flex;
+        min-height: 100vh;
+        background: #f3f4f6;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .dashboard-sidebar {
+        width: 220px;
+        background: #064e3b;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        height: 100vh;
+        overflow-y: auto;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+    }
+    .sidebar-logo {
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-logo img {
+        height: 110px;
+        width: auto;
+        object-fit: contain;
+        max-width: 100%;
+    }
+    .sidebar-action {
+        margin: 12px 16px 4px 16px;
+        padding: 8px 12px;
+        border-radius: 9999px;
+        background: linear-gradient(135deg, #22c55e, #16a34a, #15803d);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 8px 18px rgba(34,197,94,0.35);
+    }
+    .sidebar-menu {
+        padding: 6px 8px 16px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .menu-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        margin: 2px 4px;
+        border-radius: 9999px;
+        color: #d1fae5;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    .menu-item i {
+        width: 18px;
+        text-align: center;
+        font-size: 15px;
+    }
+    .menu-item:hover {
+        background: rgba(16,185,129,0.2);
+        color: #ffffff;
+        transform: translateX(2px);
+    }
+    .menu-item.active {
+        background: linear-gradient(135deg, #22c55e, #16a34a, #15803d);
+        color: #ffffff;
+        box-shadow: 0 8px 20px rgba(16,185,129,0.35);
+    }
+    .dashboard-main {
+        flex: 1;
+        margin-left: 220px;
+        display: flex;
+        flex-direction: column;
+    }
+    .dashboard-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 24px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #ffffff;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+    }
+    .header-profile {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .profile-notification {
+        position: relative;
+        padding: 8px;
+        border-radius: 9999px;
+        background: #f3f4f6;
+        cursor: pointer;
+    }
+    .profile-user {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 9999px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        cursor: pointer;
+    }
+    .profile-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 9999px;
+        background: #22c55e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 14px;
+    }
+    .profile-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #111827;
+    }
+    .profile-dropdown {
+        position: absolute;
+        right: 24px;
+        top: 64px;
+        width: 220px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 20px 45px rgba(15,23,42,0.15);
+        border: 1px solid #e5e7eb;
+        padding: 8px 0;
+        z-index: 30;
+    }
+    .profile-dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 14px;
+        font-size: 14px;
+        color: #374151;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .profile-dropdown-item:hover {
+        background: #f3f4f6;
+    }
+    .dashboard-content {
+        padding: 20px 24px 32px 24px;
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0,1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+    .stat-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 16px 18px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 30px rgba(15,23,42,0.08);
+    }
+    .stat-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .stat-card-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+    }
+    .stat-card-value {
+        font-size: 22px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 2px;
+    }
+    .stat-card-label {
+        font-size: 12px;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .content-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+        gap: 20px;
+        align-items: flex-start;
+    }
+    .content-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 18px 18px 20px 18px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 30px rgba(15,23,42,0.08);
+    }
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+    .card-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #111827;
+    }
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    .data-table th,
+    .data-table td {
+        padding: 10px 10px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+        white-space: nowrap;
+    }
+    .data-table th {
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 9px;
+        border-radius: 9999px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-in-progress { background: #dbeafe; color: #1d4ed8; }
+    .status-completed { background: #dcfce7; color: #166534; }
+    .empty-state {
+        padding: 20px 12px;
+        text-align: center;
+        color: #6b7280;
+    }
+    .empty-state-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 9999px;
+        background: #f3f4f6;
+        margin: 0 auto 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #9ca3af;
+    }
+    .empty-state-text {
+        font-size: 14px;
+    }
+    @media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2,minmax(0,1fr));
+        }
+        .content-grid {
+            grid-template-columns: minmax(0,1fr);
+        }
+    }
+    @media (max-width: 768px) {
+        .dashboard-sidebar {
+            position: fixed;
+            transform: translateX(-100%);
+            transition: transform 0.25s ease;
+            z-index: 40;
+        }
+        .dashboard-sidebar.open {
+            transform: translateX(0);
+        }
+        .dashboard-main {
+            margin-left: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-logo">
+            <img src="{{ static('images/logo 1.png') }}" alt="Isuku Logo" onerror="this.style.display='none';">
+        </div>
+
+        <div class="sidebar-action">
+            <div>
+                <div style="font-size:12px;opacity:0.85;">Status</div>
+                <div class="px-2 py-1 rounded-full text-xs font-semibold {% if collector.is_available %}status-completed{% else %}status-pending{% endif %}" style="display:inline-block;margin-top:2px;">
+                    {% if collector.is_available %}Available{% else %}Unavailable{% endif %}
+                </div>
+            </div>
+            <div style="text-align:right;font-size:11px;line-height:1.2;">
+                <div style="opacity:0.8;">Area</div>
+                <div>
+                    {% if collector.district %}
+                        {{ collector.district.name }}, {{ collector.district.province.name }}
+                    {% elif collector.user.household_profile and collector.user.household_profile.district %}
+                        {{ collector.user.household_profile.district.name }}, {{ collector.user.household_profile.district.province.name }}
+                    {% else %}
+                        Not set
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-menu">
+            <a href="{{ url('registration:collector_dashboard') }}" class="menu-item {% if current_page == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url('registration:collector_available') }}" class="menu-item {% if current_page == 'available' %}active{% endif %}">
+                <i class="fas fa-list-alt"></i>
+                <span>Available Pickups</span>
+            </a>
+            <a href="{{ url('registration:collector_assigned') }}" class="menu-item {% if current_page == 'assigned' %}active{% endif %}">
+                <i class="fas fa-tasks"></i>
+                <span>My Assignments</span>
+            </a>
+            <a href="{{ url('registration:collector_profile') }}" class="menu-item {% if current_page == 'profile' %}active{% endif %}">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="dashboard-main">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div>
+                <div style="font-size:18px;font-weight:700;color:#111827;">Collector Dashboard</div>
+                <div style="font-size:13px;color:#6b7280;">Manage your pickup assignments and routes</div>
+            </div>
+            <div class="header-profile">
+                <div class="profile-notification">
+                    <i class="fas fa-bell" style="font-size:18px;color:#6b7280;"></i>
+                    {% if notifications %}
+                    <span style="position:absolute;top:4px;right:4px;width:8px;height:8px;background:#ef4444;border-radius:9999px;"></span>
+                    {% endif %}
+                </div>
+                <div class="profile-user" id="collector-profile-toggle">
+                    <div class="profile-avatar">
+                        {% if collector.user.first_name %}{{ collector.user.first_name.0 }}{{ collector.user.last_name.0 }}{% else %}{{ collector.user.username.0|upper }}{% endif %}
+                    </div>
+                    <div class="profile-name">
+                        {% if collector.user.first_name %}{{ collector.user.first_name }} {{ collector.user.last_name }}{% else %}{{ collector.user.username }}{% endif %}
+                    </div>
+                    <i class="fas fa-chevron-down" style="font-size:11px;color:#9ca3af;"></i>
+                </div>
+                <div class="profile-dropdown" id="collector-profile-dropdown" style="display:none;">
+                    <a href="#profile-section" class="profile-dropdown-item">
+                        <i class="fas fa-user-circle"></i>Profile
+                    </a>
+                    <div class="profile-dropdown-item" style="cursor:default;justify-content:space-between;">
+                        <span><i class="fas fa-circle mr-2"></i>Status</span>
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold {% if collector.is_available %}status-completed{% else %}status-pending{% endif %}">
+                            {% if collector.is_available %}Available{% else %}Unavailable{% endif %}
+                        </span>
+                    </div>
+                    <a href="{{ url('registration:logout') }}" class="profile-dropdown-item">
+                        <i class="fas fa-sign-out-alt"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="dashboard-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon" style="background:#dcfce7;color:#16a34a;">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card-value">{{ assigned_pickups|length }}</div>
+                    <div class="stat-card-label">Assigned Pickups</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon" style="background:#dbeafe;color:#2563eb;">
+                            <i class="fas fa-list-alt"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card-value">{{ available_pickups|length }}</div>
+                    <div class="stat-card-label">Available Requests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon" style="background:#fef3c7;color:#d97706;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card-value">
+                        {{ assigned_pickups|selectattr('status','equalto','Completed')|list|length }}
+                    </div>
+                    <div class="stat-card-label">Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon" style="background:#f3e8ff;color:#7c3aed;">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card-value">
+                        {{ assigned_pickups|selectattr('status','equalto','In Progress')|list|length }}
+                    </div>
+                    <div class="stat-card-label">In Progress</div>
+                </div>
+            </div>
+
+            <!-- Main grid -->
+            <div class="content-grid">
+                {% if current_page == 'dashboard' or current_page == 'assigned' %}
+                <!-- Left: Assigned pickups -->
+                <div class="content-card" id="assigned-section">
+                    <div class="card-header">
+                        <h2 class="card-title">My Assigned Pickups</h2>
+                    </div>
+                    {% if assigned_pickups %}
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Category</th>
+                                    <th>Quantity</th>
+                                    <th>Address</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pickup in assigned_pickups %}
+                                <tr>
+                                    <td>#{{ pickup.id }}</td>
+                                    <td>{{ pickup.waste_category.name }}</td>
+                                    <td>{{ pickup.quantity }} kg</td>
+                                    <td>{{ pickup.address }}</td>
+                                    <td>
+                                        <span class="status-badge
+                                            {% if pickup.status == 'Completed' %}status-completed
+                                            {% elif pickup.status == 'In Progress' %}status-in-progress
+                                            {% else %}status-pending{% endif %}">
+                                            {{ pickup.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <p class="empty-state-text">No assigned pickups yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Right column -->
+                <div style="display:flex;flex-direction:column;gap:18px;">
+                    {% if current_page == 'dashboard' or current_page == 'available' %}
+                    <!-- Available pickups -->
+                    <div class="content-card" id="available-section">
+                        <div class="card-header">
+                            <h2 class="card-title">Available Pickups</h2>
+                        </div>
+                        {% if available_pickups %}
+                        <div style="display:flex;flex-direction:column;gap:12px;">
+                            {% for pickup in available_pickups %}
+                            <div style="border-radius:12px;border:1px solid #e5e7eb;padding:12px;background:#f9fafb;">
+                                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+                                    <div style="flex:1;">
+                                        <div style="font-weight:600;color:#111827;font-size:14px;margin-bottom:4px;">
+                                            Request #{{ pickup.id }}
+                                        </div>
+                                        <div style="font-size:13px;color:#4b5563;">
+                                            <div><i class="fas fa-tag mr-1"></i>{{ pickup.waste_category.name }}</div>
+                                            <div><i class="fas fa-weight mr-1"></i>{{ pickup.quantity }} kg</div>
+                                            <div><i class="fas fa-map-marker-alt mr-1"></i>{{ pickup.address }}</div>
+                                        </div>
+                                    </div>
+                                    <form method="post" action="{{ url('registration:assign_pickup', pickup.id) }}">
+                                        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                                        <button type="submit" class="btn-primary" style="font-size:12px;padding:6px 10px;">
+                                            <i class="fas fa-hand-paper mr-1"></i>Assign to me
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-inbox"></i>
+                            </div>
+                            <p class="empty-state-text">No available pickups right now.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if current_page == 'dashboard' %}
+                    <!-- Notifications -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Notifications</h2>
+                        </div>
+                        {% if notifications %}
+                        <div style="display:flex;flex-direction:column;gap:10px;">
+                            {% for notification in notifications %}
+                            <div style="padding:10px 12px;border-radius:10px;background:#f9fafb;border:1px solid #e5e7eb;">
+                                <p style="font-weight:600;color:#111827;font-size:14px;margin-bottom:2px;">
+                                    {{ notification.title }}
+                                </p>
+                                <p style="font-size:13px;color:#4b5563;">
+                                    {{ notification.message }}
+                                </p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-bell-slash"></i>
+                                </div>
+                                <p class="empty-state-text">No new notifications</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Profile -->
+                    <div class="content-card" id="profile-section">
+                        <div class="card-header">
+                            <h2 class="card-title">Profile</h2>
+                        </div>
+                        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;font-size:13px;">
+                            <div>
+                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;">Name</div>
+                                <div style="color:#111827;">
+                                    {% if collector.user.first_name %}{{ collector.user.first_name }} {{ collector.user.last_name }}{% else %}{{ collector.user.username }}{% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;">Email</div>
+                                <div style="color:#111827;">{{ collector.user.email }}</div>
+                            </div>
+                            <div>
+                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;">Phone</div>
+                                <div style="color:#111827;">{{ collector.phone_number }}</div>
+                            </div>
+                            <div>
+                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;">License Number</div>
+                                <div style="color:#111827;">
+                                    {% if collector.license_number %}{{ collector.license_number }}{% else %}Not provided{% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;">Vehicle Number</div>
+                                <div style="color:#111827;">
+                                    {% if collector.vehicle_number %}{{ collector.vehicle_number }}{% else %}Not provided{% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;">Verification</div>
+                                <div>
+                                    {% if collector.is_verified %}
+                                    <span class="status-badge status-completed">Verified</span>
+                                    {% else %}
+                                    <span class="status-badge status-pending">Pending</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const profileToggle = document.getElementById('collector-profile-toggle');
+        const profileDropdown = document.getElementById('collector-profile-dropdown');
+
+        if (profileToggle && profileDropdown) {
+            profileToggle.addEventListener('click', function (e) {
+                e.stopPropagation();
+                profileDropdown.style.display =
+                    profileDropdown.style.display === 'none' || profileDropdown.style.display === ''
+                        ? 'block'
+                        : 'none';
+            });
+            document.addEventListener('click', function () {
+                profileDropdown.style.display = 'none';
+            });
+            profileDropdown.addEventListener('click', function (e) {
+                e.stopPropagation();
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+

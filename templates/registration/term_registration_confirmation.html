@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Term Registration - ALU Student Portal{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-white py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Completion Message -->
+        <div class="mb-8">
+            <p class="text-green-600 text-lg font-medium mb-2">
+                You have completed the registration process.
+            </p>
+            <p class="text-black mb-2">
+                Please see a record of your submission below.
+            </p>
+            <p class="text-green-600 mb-1">
+                Please submit a ticket <a href="#" class="text-blue-600 underline hover:text-blue-800">here</a> if you wish to make any changes.
+            </p>
+            <p class="text-black">
+                Please submit a ticket <a href="#" class="text-blue-600 underline hover:text-blue-800">here</a> if you wish to make any changes.
+            </p>
+        </div>
+
+        <!-- Student Details Section -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-xl font-bold text-blue-600 mb-4">Student Details:</h2>
+            <div class="space-y-2 text-black">
+                <p><span class="font-semibold">Campus:</span> {% if student.campus %}{{ student.campus.name }}{% else %}N/A{% endif %}</p>
+                <p><span class="font-semibold">Programme:</span> {% if student.programme %}{{ student.programme.name }}{% else %}N/A{% endif %}</p>
+                <p><span class="font-semibold">Year Group:</span> {% if student.year_group %}{{ student.year_group.name }}{% else %}N/A{% endif %}</p>
+                <p><span class="font-semibold">Academic Standing:</span> {{ student.academic_standing }}</p>
+                <p><span class="font-semibold">Financial Standing:</span> {{ student.financial_standing }}</p>
+            </div>
+            <p class="mt-4 text-sm">
+                To request any changes to the above information, please submit a ticket <a href="#" class="text-blue-600 underline hover:text-blue-800">here</a>.
+            </p>
+        </div>
+
+        <!-- Term Registration Section -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+            <h2 class="text-xl font-bold text-black mb-4">Term Registration</h2>
+            
+            {% if term_registration and (term_registration.status == 'Submitted' or term_registration.status == 'Completed') %}
+            <p class="text-blue-600 mb-6">
+                You have already submitted the term registration form for the upcoming term.
+            </p>
+            {% elif term_registration and term_registration.status == 'Paused' %}
+            <p class="text-blue-600 mb-6">
+                Your term registration is currently paused.
+            </p>
+            {% else %}
+            <p class="text-blue-600 mb-6">
+                Please complete your term registration.
+            </p>
+            {% endif %}
+
+            <div class="flex gap-4">
+                <form method="POST" action="{% url 'registration:pause_registration' %}" class="flex-1">
+                    {% csrf_token %}
+                    <button 
+                        type="submit"
+                        class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded transition-colors duration-200"
+                    >
+                        Pause
+                    </button>
+                </form>
+                <form method="POST" action="{% url 'registration:finish_registration' %}" class="flex-1">
+                    {% csrf_token %}
+                    <button 
+                        type="submit"
+                        class="w-full bg-blue-700 hover:bg-blue-800 text-white font-medium py-2 px-4 rounded transition-colors duration-200"
+                    >
+                        Finish
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Messages Display -->
+{% if messages %}
+<div id="messages" class="fixed top-4 right-4 z-50 space-y-2">
+    {% for message in messages %}
+    <div class="bg-{{ message.tags }}-100 border border-{{ message.tags }}-400 text-{{ message.tags }}-700 px-4 py-3 rounded relative shadow-lg max-w-md" role="alert">
+        <span class="block sm:inline">{{ message }}</span>
+        <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" onclick="this.parentElement.remove()">
+            <svg class="fill-current h-6 w-6 text-{{ message.tags }}-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+            </svg>
+        </span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-hide messages after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = document.getElementById('messages');
+        if (messages) {
+            setTimeout(function() {
+                messages.style.transition = 'opacity 0.5s';
+                messages.style.opacity = '0';
+                setTimeout(function() {
+                    messages.remove();
+                }, 500);
+            }, 5000);
+        }
+
+        // Handle form submissions with confirmation
+        const pauseForm = document.querySelector('form[action*="pause"]');
+        const finishForm = document.querySelector('form[action*="finish"]');
+
+        if (pauseForm) {
+            pauseForm.addEventListener('submit', function(e) {
+                if (!confirm('Are you sure you want to pause your registration?')) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        if (finishForm) {
+            finishForm.addEventListener('submit', function(e) {
+                if (!confirm('Are you sure you want to finish your registration? This action cannot be undone.')) {
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+

@@ -1,0 +1,84 @@
+# English translations for Isuku App
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+
+msgid "HOME"
+msgstr "HOME"
+
+msgid "ABOUT US"
+msgstr "ABOUT US"
+
+msgid "SERVICES"
+msgstr "SERVICES"
+
+msgid "CONTACT US"
+msgstr "CONTACT US"
+
+msgid "LANGUAGE"
+msgstr "LANGUAGE"
+
+msgid "GET STARTED"
+msgstr "GET STARTED"
+
+msgid "Smart Waste Management"
+msgstr "Smart Waste Management"
+
+msgid "WASTE MANAGEMENT"
+msgstr "WASTE MANAGEMENT"
+
+msgid "SYSTEM"
+msgstr "SYSTEM"
+
+msgid "We are committed to connecting households with waste collectors through sanitation technology, with the goal of sorting waste, managing it properly, and protecting the environment."
+msgstr "We are committed to connecting households with waste collectors through sanitation technology, with the goal of sorting waste, managing it properly, and protecting the environment."
+
+msgid "LEARN MORE"
+msgstr "LEARN MORE"
+
+msgid "Households"
+msgstr "Households"
+
+msgid "Collectors"
+msgstr "Collectors"
+
+msgid "Pickups"
+msgstr "Pickups"
+
+msgid "Eco-Friendly"
+msgstr "Eco-Friendly"
+
+msgid "Sustainable"
+msgstr "Sustainable"
+
+msgid "About Us"
+msgstr "About Us"
+
+msgid "Leading the way in sustainable waste management solutions"
+msgstr "Leading the way in sustainable waste management solutions"
+
+msgid "Our Mission"
+msgstr "Our Mission"
+
+msgid "Mission"
+msgstr "Mission"
+
+msgid "Our mission is to manage waste properly, encourage households to sort their waste, and protect the environment for a cleaner and sustainable future. We believe that every action counts in building a better world for generations to come."
+msgstr "Our mission is to manage waste properly, encourage households to sort their waste, and protect the environment for a cleaner and sustainable future. We believe that every action counts in building a better world for generations to come."
+
+msgid "Environmental Protection"
+msgstr "Environmental Protection"
+
+msgid "Our Vision"
+msgstr "Our Vision"
+
+msgid "Vision"
+msgstr "Vision"
+
+msgid "Our vision is to create a world where waste is seen as a resource, where every household actively participates in sustainable waste management, and where our environment thrives for future generations."
+msgstr "Our vision is to create a world where waste is seen as a resource, where every household actively participates in sustainable waste management, and where our environment thrives for future generations."
+
+msgid "Sustainability"
+msgstr "Sustainability"
+
