@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: isuku-app
+    env: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: gunicorn isuku_app.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.6
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_FILE
+        value: /opt/render/project/src/db.sqlite3
+      - key: ALLOWED_HOSTS
+        value: isuku-app.onrender.com
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://isuku-app.onrender.com
+    healthCheckPath: /
+
