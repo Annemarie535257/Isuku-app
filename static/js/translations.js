@@ -134,6 +134,13 @@ const translations = {
         "Please enter all 6 digits": "Please enter all 6 digits",
         "Your OTP Code": "Your OTP Code",
         "Enter this code in the fields above": "Enter this code in the fields above",
+        "Logout": "Logout",
+        "Dashboard": "Dashboard",
+        "My Requests": "My Requests",
+        "Notifications": "Notifications",
+        "Help & Support": "Help & Support",
+        "History": "History",
+        "Settings": "Settings",
     },
     rw: {
         "HOME": "AYANZU",
@@ -269,6 +276,13 @@ const translations = {
         "Please enter all 6 digits": "Nyamuneka andika imibare 6 yose",
         "Your OTP Code": "Kode yawe ya OTP",
         "Enter this code in the fields above": "Andika kode iyi mu mwanya w'hejuru",
+        "Logout": "Sohoka",
+        "Dashboard": "Ikibaho",
+        "My Requests": "Ibyifuzo Byanjye",
+        "Notifications": "Amatangazo",
+        "Help & Support": "Ubufasha n'Inkunga",
+        "History": "Amateka",
+        "Settings": "Igenamiterere",
     },
     fr: {
         "HOME": "ACCUEIL",
@@ -404,6 +418,13 @@ const translations = {
         "Please enter all 6 digits": "Veuillez entrer les 6 chiffres",
         "Your OTP Code": "Votre Code OTP",
         "Enter this code in the fields above": "Entrez ce code dans les champs ci-dessus",
+        "Logout": "Déconnexion",
+        "Dashboard": "Tableau de bord",
+        "My Requests": "Mes Demandes",
+        "Notifications": "Notifications",
+        "Help & Support": "Aide et Support",
+        "History": "Historique",
+        "Settings": "Paramètres",
     }
 };
 

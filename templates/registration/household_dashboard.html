@@ -83,6 +83,8 @@
     .sidebar-menu {
         flex: 1;
         padding: 20px 0;
+        display: flex;
+        flex-direction: column;
     }
     
     .menu-item {
@@ -466,6 +468,10 @@
             <a href="{{ url('registration:household_settings') }}" class="menu-item {% if current_page == 'settings' %}active{% endif %}">
                 <i class="fas fa-cog"></i>
                 <span data-translate="Settings">Settings</span>
+            </a>
+            <a href="{{ url('registration:logout') }}" class="menu-item" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 14px;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span data-translate="Logout">Logout</span>
             </a>
         </nav>
     </aside>
@@ -1143,17 +1149,59 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Language switcher
-        const langSelect = document.getElementById('language-select');
-        if (langSelect && window.TranslationManager) {
-            const currentLang = window.TranslationManager.getCurrentLanguage();
-            if (currentLang) {
-                langSelect.value = currentLang;
+        // Language switcher - wait for TranslationManager to load
+        function initLanguageSwitcher() {
+            const langSelect = document.getElementById('language-select');
+            if (!langSelect) return;
+            
+            // Wait for TranslationManager to be available
+            if (window.TranslationManager) {
+                const currentLang = window.TranslationManager.getCurrentLanguage();
+                if (currentLang) {
+                    langSelect.value = currentLang;
+                }
+                langSelect.addEventListener('change', function() {
+                    if (window.TranslationManager) {
+                        window.TranslationManager.setLanguage(this.value);
+                        setTimeout(() => {
+                            if (window.TranslationManager) {
+                                window.TranslationManager.applyTranslations();
+                            }
+                        }, 200);
+                    }
+                });
+            } else {
+                // Wait for TranslationManager to load
+                let attempts = 0;
+                const maxAttempts = 30;
+                const checkInterval = setInterval(() => {
+                    attempts++;
+                    if (window.TranslationManager) {
+                        clearInterval(checkInterval);
+                        const currentLang = window.TranslationManager.getCurrentLanguage();
+                        if (currentLang) {
+                            langSelect.value = currentLang;
+                        }
+                        langSelect.addEventListener('change', function() {
+                            if (window.TranslationManager) {
+                                window.TranslationManager.setLanguage(this.value);
+                                setTimeout(() => {
+                                    if (window.TranslationManager) {
+                                        window.TranslationManager.applyTranslations();
+                                    }
+                                }, 200);
+                            }
+                        });
+                    } else if (attempts >= maxAttempts) {
+                        clearInterval(checkInterval);
+                        console.error('TranslationManager failed to load');
+                    }
+                }, 100);
             }
-            langSelect.addEventListener('change', function() {
-                window.TranslationManager.setLanguage(this.value);
-            });
         }
+        
+        // Initialize language switcher
+        initLanguageSwitcher();
 
         // Mobile sidebar toggle
         const mobileToggle = document.getElementById('mobile-menu-toggle');
