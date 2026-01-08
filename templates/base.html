@@ -8,6 +8,26 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Load translations early to ensure availability on user interaction -->
     <script src="{{ static('js/translations.js') }}"></script>
+    <script>
+        // Ensure TranslationManager initializes immediately after loading
+        (function() {
+            if (window.TranslationManager && typeof window.TranslationManager.init === 'function') {
+                window.TranslationManager.init();
+            } else {
+                // If script hasn't loaded yet, wait for it
+                const checkInit = setInterval(function() {
+                    if (window.TranslationManager && typeof window.TranslationManager.init === 'function') {
+                        clearInterval(checkInit);
+                        window.TranslationManager.init();
+                    }
+                }, 50);
+                // Stop checking after 5 seconds
+                setTimeout(function() {
+                    clearInterval(checkInit);
+                }, 5000);
+            }
+        })();
+    </script>
     <style>
         /* Clean, Professional Color Palette */
         .green-primary { color: #059669; }

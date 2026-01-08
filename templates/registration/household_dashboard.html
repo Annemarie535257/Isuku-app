@@ -1148,6 +1148,52 @@
 </div>
 
 <script>
+    // Ensure translations are applied when page loads
+    function initializeTranslations() {
+        // Wait for TranslationManager to be available
+        if (window.TranslationManager) {
+            // Make sure it's initialized
+            if (typeof window.TranslationManager.init === 'function') {
+                window.TranslationManager.init();
+            }
+            // Apply translations immediately
+            if (typeof window.TranslationManager.applyTranslations === 'function') {
+                window.TranslationManager.applyTranslations();
+            }
+        } else {
+            // Wait for TranslationManager to load
+            let attempts = 0;
+            const maxAttempts = 50;
+            const checkInterval = setInterval(() => {
+                attempts++;
+                if (window.TranslationManager) {
+                    clearInterval(checkInterval);
+                    if (typeof window.TranslationManager.init === 'function') {
+                        window.TranslationManager.init();
+                    }
+                    if (typeof window.TranslationManager.applyTranslations === 'function') {
+                        window.TranslationManager.applyTranslations();
+                    }
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(checkInterval);
+                    console.error('TranslationManager failed to load after', maxAttempts * 100, 'ms');
+                }
+            }, 100);
+        }
+    }
+    
+    // Try to initialize immediately
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeTranslations);
+    } else {
+        initializeTranslations();
+    }
+    
+    // Also try on window load as fallback
+    window.addEventListener('load', function() {
+        setTimeout(initializeTranslations, 100);
+    });
+    
     document.addEventListener('DOMContentLoaded', function() {
         // Language switcher - wait for TranslationManager to load
         function initLanguageSwitcher() {
@@ -1164,7 +1210,7 @@
                     if (window.TranslationManager) {
                         window.TranslationManager.setLanguage(this.value);
                         setTimeout(() => {
-                            if (window.TranslationManager) {
+                            if (window.TranslationManager && typeof window.TranslationManager.applyTranslations === 'function') {
                                 window.TranslationManager.applyTranslations();
                             }
                         }, 200);
@@ -1173,7 +1219,7 @@
             } else {
                 // Wait for TranslationManager to load
                 let attempts = 0;
-                const maxAttempts = 30;
+                const maxAttempts = 50;
                 const checkInterval = setInterval(() => {
                     attempts++;
                     if (window.TranslationManager) {
@@ -1186,7 +1232,7 @@
                             if (window.TranslationManager) {
                                 window.TranslationManager.setLanguage(this.value);
                                 setTimeout(() => {
-                                    if (window.TranslationManager) {
+                                    if (window.TranslationManager && typeof window.TranslationManager.applyTranslations === 'function') {
                                         window.TranslationManager.applyTranslations();
                                     }
                                 }, 200);
