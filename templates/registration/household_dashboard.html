@@ -660,7 +660,7 @@
                                 <div style="font-size: 11px; color: #6b7280; text-transform: uppercase;">Requests</div>
                             </div>
                             <div style="text-align: right;">
-                                <div style="font-size: 18px; font-weight: 600; color: #065f46;">{{ stat.total_weight|floatformat:1|default:"0.0" }}</div>
+                                <div style="font-size: 18px; font-weight: 600; color: #065f46;">{{ (stat.total_weight or 0)|round(1) }}</div>
                                 <div style="font-size: 11px; color: #6b7280; text-transform: uppercase;">kg</div>
                             </div>
                         </div>
@@ -1355,7 +1355,7 @@
                     description: '{{ category.description|default("")|escapejs }}',
                     color: '{{ category.color_code }}',
                     icon: '{{ category.icon|default("fa-trash-alt") }}'
-                }{% if not forloop.last %},{% endif %}
+                }{% if not loop.last %},{% endif %}
                 {% endfor %}
             };
             

@@ -507,7 +507,7 @@
                                             Request #{{ pickup.id }}
                                         </div>
                                         <div style="font-size:13px;color:#4b5563;">
-                                            <div><i class="fas fa-tag mr-1"></i>{{ pickup.waste_category.name }}</div>
+                                            <div>{{ pickup.waste_category|waste_category_badge|safe }}</div>
                                             <div><i class="fas fa-weight mr-1"></i>{{ pickup.quantity }} kg</div>
                                             <div><i class="fas fa-map-marker-alt mr-1"></i>{{ pickup.address }}</div>
                                         </div>

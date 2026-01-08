@@ -96,6 +96,21 @@ def environment(**options):
         except:
             return str(value)
     
+    def escapejs_filter(value):
+        """Escape characters for use in JavaScript strings"""
+        if value is None:
+            return ''
+        value = str(value)
+        # Escape characters that are problematic in JavaScript strings
+        value = value.replace('\\', '\\\\')  # Backslash
+        value = value.replace("'", "\\'")    # Single quote
+        value = value.replace('"', '\\"')    # Double quote
+        value = value.replace('\n', '\\n')   # Newline
+        value = value.replace('\r', '\\r')   # Carriage return
+        value = value.replace('\t', '\\t')   # Tab
+        value = value.replace('</', '<\\/')  # Closing script tag prevention
+        return value
+    
     def waste_category_badge(category):
         """Generate HTML badge for waste category with color and icon"""
         if not category:
@@ -121,6 +136,7 @@ def environment(**options):
     
     env.filters['date'] = date_filter
     env.filters['format'] = format_filter
+    env.filters['escapejs'] = escapejs_filter
     env.filters['waste_category_badge'] = waste_category_badge
     
     env.globals.update({
