@@ -978,38 +978,56 @@
             chevron.style.transform = 'rotate(0deg)';
         }
         
-        // Ensure TranslationManager exists; if not, load it dynamically then proceed
+        // Ensure TranslationManager exists; if not, wait for it or load it dynamically
         if (!window.TranslationManager) {
-            console.warn('TranslationManager not found; loading script dynamically...');
-            const scriptUrl = "{{ static('js/translations.js') }}";
-            const s = document.createElement('script');
-            s.src = scriptUrl;
-            s.defer = true;
-            s.onload = function () {
+            console.warn('TranslationManager not found; waiting for it to load...');
+            // Wait for TranslationManager to be available (with timeout)
+            let attempts = 0;
+            const maxAttempts = 20; // Wait up to 2 seconds (20 * 100ms)
+            const checkInterval = setInterval(() => {
+                attempts++;
                 if (window.TranslationManager) {
-                    const ok = window.TranslationManager.setLanguage(lang);
-                    if (ok) {
+                    clearInterval(checkInterval);
+                    const success = window.TranslationManager.setLanguage(lang);
+                    if (success) {
                         setTimeout(() => window.TranslationManager.applyTranslations(), 200);
-                    } else {
-                        alert('Failed to change language. Please try again.');
                     }
-                } else {
-                    alert('Translation system not loaded. Please refresh the page.');
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(checkInterval);
+                    console.error('TranslationManager failed to load');
+                    // Try loading script dynamically as fallback
+                    const scriptUrl = "{{ static('js/translations.js') }}";
+                    const s = document.createElement('script');
+                    s.src = scriptUrl;
+                    s.onload = function () {
+                        if (window.TranslationManager) {
+                            window.TranslationManager.setLanguage(lang);
+                            setTimeout(() => window.TranslationManager.applyTranslations(), 200);
+                        }
+                    };
+                    s.onerror = function () {
+                        console.error('Failed to load translations.js from:', scriptUrl);
+                    };
+                    document.head.appendChild(s);
                 }
-            };
-            s.onerror = function () {
-                alert('Failed to load translation resources.');
-            };
-            document.head.appendChild(s);
+            }, 100);
             return;
         }
         
         // Change language when TranslationManager is available
-        const success = window.TranslationManager.setLanguage(lang);
-        if (success) {
-            setTimeout(() => window.TranslationManager.applyTranslations(), 200);
-        } else {
-            alert('Failed to change language. Please try again.');
+        try {
+            const success = window.TranslationManager.setLanguage(lang);
+            if (success) {
+                setTimeout(() => {
+                    if (window.TranslationManager) {
+                        window.TranslationManager.applyTranslations();
+                    }
+                }, 200);
+            } else {
+                console.error('Failed to set language:', lang);
+            }
+        } catch (error) {
+            console.error('Error changing language:', error);
         }
     }
 
