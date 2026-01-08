@@ -49,12 +49,12 @@ class Command(BaseCommand):
         
         # Create Waste Categories
         categories = [
-            {'name': 'Organic Waste', 'description': 'Biodegradable waste', 'color_code': '#4CAF50'},
-            {'name': 'Plastic Waste', 'description': 'Plastic materials', 'color_code': '#2196F3'},
-            {'name': 'Paper Waste', 'description': 'Paper and cardboard', 'color_code': '#FF9800'},
-            {'name': 'Glass Waste', 'description': 'Glass materials', 'color_code': '#9C27B0'},
-            {'name': 'Metal Waste', 'description': 'Metal materials', 'color_code': '#607D8B'},
-            {'name': 'General Waste', 'description': 'Non-recyclable waste', 'color_code': '#795548'},
+            {'name': 'Organic Waste', 'description': 'Biodegradable waste like food scraps, garden waste', 'color_code': '#4CAF50', 'icon': 'fa-leaf'},
+            {'name': 'Plastic Waste', 'description': 'Plastic materials, bottles, containers', 'color_code': '#2196F3', 'icon': 'fa-wine-bottle'},
+            {'name': 'Paper Waste', 'description': 'Paper and cardboard materials', 'color_code': '#FF9800', 'icon': 'fa-file-alt'},
+            {'name': 'Glass Waste', 'description': 'Glass bottles and containers', 'color_code': '#9C27B0', 'icon': 'fa-wine-glass'},
+            {'name': 'Metal Waste', 'description': 'Metal materials, cans, scrap metal', 'color_code': '#607D8B', 'icon': 'fa-cog'},
+            {'name': 'General Waste', 'description': 'Non-recyclable and mixed waste', 'color_code': '#795548', 'icon': 'fa-trash-alt'},
         ]
         
         for cat_data in categories:

@@ -96,8 +96,32 @@ def environment(**options):
         except:
             return str(value)
     
+    def waste_category_badge(category):
+        """Generate HTML badge for waste category with color and icon"""
+        if not category:
+            return ''
+        color = category.color_code if hasattr(category, 'color_code') else '#059669'
+        icon = category.icon if hasattr(category, 'icon') and category.icon else 'fa-trash-alt'
+        name = category.name if hasattr(category, 'name') else str(category)
+        
+        # Map common waste types to icons if not set
+        icon_map = {
+            'Organic Waste': 'fa-leaf',
+            'Plastic Waste': 'fa-wine-bottle',
+            'Paper Waste': 'fa-file-alt',
+            'Glass Waste': 'fa-wine-glass',
+            'Metal Waste': 'fa-cog',
+            'General Waste': 'fa-trash-alt',
+        }
+        
+        if not icon or icon == '':
+            icon = icon_map.get(name, 'fa-trash-alt')
+        
+        return f'<span class="waste-category-badge" style="background-color: {color}20; color: {color}; border: 1px solid {color}40; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;"><i class="fas {icon}"></i> {name}</span>'
+    
     env.filters['date'] = date_filter
     env.filters['format'] = format_filter
+    env.filters['waste_category_badge'] = waste_category_badge
     
     env.globals.update({
         'static': static_file,

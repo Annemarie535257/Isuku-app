@@ -38,10 +38,12 @@ def landing_page(request):
     """Landing page view"""
     from django.contrib.messages import get_messages
     provinces = Province.objects.all()
+    waste_categories = WasteCategory.objects.all()
     
     context = {
         'messages': list(get_messages(request)),
         'provinces': provinces,
+        'waste_categories': waste_categories,
     }
     return render(request, 'landing.html', context)
 
@@ -216,6 +218,17 @@ def household_dashboard(request):
     pending_requests = all_pickup_requests.filter(status='Pending').count()
     total_weight = sum([req.quantity for req in all_pickup_requests])
     
+    # Calculate statistics by waste category
+    from django.db.models import Sum, Count
+    category_stats = WastePickupRequest.objects.filter(household=household).values(
+        'waste_category__id', 'waste_category__name', 'waste_category__color_code'
+    ).annotate(
+        total_count=Count('id'),
+        total_weight=Sum('quantity'),
+        completed_count=Count('id', filter=Q(status='Completed')),
+        pending_count=Count('id', filter=Q(status='Pending'))
+    ).order_by('-total_count')
+    
     # Get scheduled pickups for calendar (with collector info)
     # Include both scheduled pickups and pending requests that might be scheduled
     scheduled_pickups = WastePickupRequest.objects.filter(
@@ -296,6 +309,7 @@ def household_dashboard(request):
         'completed_requests': completed_requests,
         'pending_requests': pending_requests,
         'total_weight': total_weight,
+        'category_stats': category_stats,
         'current_page': 'dashboard',
         'calendar_days': calendar_days,
         'current_month': month_name,

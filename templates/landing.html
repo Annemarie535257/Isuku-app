@@ -707,6 +707,31 @@
                 </a>
             </div>
         </div>
+        
+        <!-- Waste Categories Section -->
+        {% if waste_categories %}
+        <div class="mt-16">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-900 mb-4" data-translate="Waste Categories We Handle">Waste Categories We Handle</h3>
+                <p class="text-gray-600 max-w-2xl mx-auto" data-translate="We accept and properly manage various types of waste materials">We accept and properly manage various types of waste materials</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+                {% for category in waste_categories %}
+                <div class="bg-white rounded-lg p-4 border border-gray-100 hover:shadow-md transition-all duration-300" style="border-left: 4px solid {{ category.color_code }};">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div style="width: 40px; height: 40px; background: {{ category.color_code }}20; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas {{ category.icon|default:'fa-trash-alt' }}" style="color: {{ category.color_code }}; font-size: 18px;"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-900" style="color: {{ category.color_code }};">{{ category.name }}</h4>
+                    </div>
+                    {% if category.description %}
+                    <p class="text-gray-600 text-sm">{{ category.description }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
     </div>
 </section>
 

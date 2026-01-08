@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from 'isuku_app.jinja2' import waste_category_badge %}
 
 {% block title %}Admin Dashboard - Isuku{% endblock %}
 
@@ -527,7 +528,7 @@
                                         <td style="padding:12px;font-size:14px;color:#4b5563;">
                                             {% if pickup.household.user.first_name %}{{ pickup.household.user.first_name }} {{ pickup.household.user.last_name }}{% else %}{{ pickup.household.user.username }}{% endif %}
                                         </td>
-                                        <td style="padding:12px;font-size:14px;color:#4b5563;">{{ pickup.waste_category.name }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">{{ pickup.waste_category|waste_category_badge|safe }}</td>
                                         <td style="padding:12px;font-size:14px;color:#4b5563;">{{ pickup.quantity }} kg</td>
                                         <td style="padding:12px;font-size:14px;color:#4b5563;">
                                             {% if pickup.collector %}
@@ -608,7 +609,7 @@
                                                 <td style="padding:8px;color:#4b5563;">
                                                     {% if pickup.household.user.first_name %}{{ pickup.household.user.first_name }} {{ pickup.household.user.last_name }}{% else %}{{ pickup.household.user.username }}{% endif %}
                                                 </td>
-                                                <td style="padding:8px;color:#4b5563;">{{ pickup.waste_category.name }}</td>
+                                                <td style="padding:8px;color:#4b5563;">{{ pickup.waste_category|waste_category_badge|safe }}</td>
                                                 <td style="padding:8px;color:#4b5563;">
                                                     {% if pickup.scheduled_date %}{{ pickup.scheduled_date|date('M d, Y H:i') }}{% else %}<span style="color:#9ca3af;">-</span>{% endif %}
                                                 </td>
@@ -666,7 +667,7 @@
                                         <td style="padding:12px;font-size:14px;color:#4b5563;">
                                             {% if pickup.household.user.first_name %}{{ pickup.household.user.first_name }} {{ pickup.household.user.last_name }}{% else %}{{ pickup.household.user.username }}{% endif %}
                                         </td>
-                                        <td style="padding:12px;font-size:14px;color:#4b5563;">{{ pickup.waste_category.name }}</td>
+                                        <td style="padding:12px;font-size:14px;color:#4b5563;">{{ pickup.waste_category|waste_category_badge|safe }}</td>
                                         <td style="padding:12px;font-size:14px;color:#4b5563;">{{ pickup.scheduled_date|date('M d, Y H:i') }}</td>
                                         <td style="padding:12px;font-size:14px;color:#4b5563;">
                                             {% if pickup.collector %}
