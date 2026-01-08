@@ -170,6 +170,9 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Using CompressedStaticFilesStorage instead of Manifest to handle files with spaces
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
+# Ensure WhiteNoise serves static files in production
+WHITENOISE_USE_FINDERS = True  # Fallback to Django's static file finders if file not in STATIC_ROOT
+
 # Security & proxy settings (Render)
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
