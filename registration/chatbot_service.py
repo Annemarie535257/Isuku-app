@@ -2,11 +2,14 @@
 Chatbot service for loading and using the trained Llama model
 """
 import os
+import logging
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
 import warnings
 warnings.filterwarnings('ignore')
+
+logger = logging.getLogger(__name__)
 
 # Path to the trained model
 MODEL_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'AI_Chatbot', 'models', 'isuku_chatbot_llama')
@@ -29,7 +32,11 @@ def load_model():
         
         # Check if model directory exists
         if not os.path.exists(MODEL_PATH):
-            raise FileNotFoundError(f"Model not found at {MODEL_PATH}")
+            logger.warning(f"Model not found at {MODEL_PATH}. Chatbot will return default responses.")
+            # Return None to indicate model is not available
+            _model = None
+            _tokenizer = None
+            return None, None
         
         # Load tokenizer
         _tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
@@ -66,8 +73,11 @@ def load_model():
         return _model, _tokenizer
         
     except Exception as e:
-        print(f"Error loading model: {str(e)}")
-        raise
+        logger.error(f"Error loading model: {str(e)}")
+        # Return None instead of raising to allow graceful degradation
+        _model = None
+        _tokenizer = None
+        return None, None
 
 
 def generate_response(question, max_length=256, temperature=0.7):
@@ -88,8 +98,16 @@ def generate_response(question, max_length=256, temperature=0.7):
     if _model is None or _tokenizer is None:
         try:
             _model, _tokenizer = load_model()
+            # Check if model loaded successfully
+            if _model is None or _tokenizer is None:
+                return "I'm sorry, the AI chatbot model is not currently available. Please contact our support team for assistance with your waste management needs."
         except Exception as e:
-            return f"I'm sorry, but I'm currently unavailable. Error: {str(e)}. Please try again later or contact support."
+            logger.error(f"Error loading chatbot model: {str(e)}")
+            return "I'm sorry, but I'm currently unavailable. Please try again later or contact support."
+    
+    # Double-check model is available
+    if _model is None or _tokenizer is None:
+        return "I'm sorry, the AI chatbot model is not currently available. Please contact our support team for assistance with your waste management needs."
     
     try:
         # Format the prompt

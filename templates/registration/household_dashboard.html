@@ -932,7 +932,51 @@
                             <input type="hidden" name="longitude" id="pickupLongitude" value="">
                             <div style="margin-bottom: 16px;">
                                 <label class="block text-gray-700 mb-2" style="font-weight: 600; font-size: 14px;" data-translate="Waste Category">Waste Category:</label>
-                                <select name="waste_category" required
+                                
+                                <!-- AI Photo Classification Buttons -->
+                                <div style="margin-bottom: 12px;">
+                                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                        <button type="button" id="takePhotoBtn" class="btn-primary" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #059669, #10b981); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            <i class="fas fa-camera"></i>
+                                            <span data-translate="Take Photo">Take Photo</span>
+                                        </button>
+                                        
+                                        <button type="button" id="uploadPhotoBtn" class="btn-primary" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #2563eb, #3b82f6); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            <i class="fas fa-upload"></i>
+                                            <span data-translate="Upload Photo">Upload Photo</span>
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Hidden file inputs -->
+                                    <input type="file" id="wasteImageInputCamera" accept="image/*" capture="environment" style="display: none;">
+                                    <input type="file" id="wasteImageInputUpload" accept="image/*" style="display: none;">
+                                    
+                                    <!-- Image preview and classification result -->
+                                    <div id="wasteImagePreview" style="display: none; margin-top: 12px; text-align: center;">
+                                        <img id="previewImage" src="" alt="Preview" style="max-width: 100%; max-height: 200px; border-radius: 8px; border: 2px solid #e5e7eb;">
+                                        <div id="classificationResult" style="margin-top: 12px; padding: 12px; background: #f0fdf4; border-radius: 8px; border-left: 4px solid #059669;">
+                                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                                <i class="fas fa-check-circle" style="color: #059669;"></i>
+                                                <strong data-translate="Classified as">Classified as:</strong>
+                                                <span id="classifiedCategory" style="font-weight: 600; color: #059669;"></span>
+                                                <span id="classificationConfidence" style="font-size: 12px; color: #6b7280;"></span>
+                                            </div>
+                                            <div id="allPredictions" style="font-size: 12px; color: #6b7280;"></div>
+                                            <button type="button" id="useClassificationBtn" class="btn-primary" style="margin-top: 8px; padding: 6px 12px; font-size: 12px;">
+                                                <i class="fas fa-check"></i> <span data-translate="Use This Category">Use This Category</span>
+                                            </button>
+                                            <button type="button" id="retakePhotoBtn" style="margin-top: 8px; margin-left: 8px; padding: 6px 12px; font-size: 12px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 6px; cursor: pointer;">
+                                                <i class="fas fa-redo"></i> <span data-translate="Retake">Retake</span>
+                                            </button>
+                                        </div>
+                                        <div id="classificationError" style="display: none; margin-top: 12px; padding: 12px; background: #fef2f2; border-radius: 8px; border-left: 4px solid #ef4444; color: #dc2626;">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            <span id="errorMessage"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <select name="waste_category" id="wasteCategorySelect" required
                                         style="width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
                                     <option value="" data-translate="Select Category">Select Category</option>
                                     {% for category in waste_categories %}
@@ -1396,6 +1440,186 @@
                     categoryDescription.innerHTML = '';
                 }
             });
+        }
+        
+        // AI Waste Classification
+        const takePhotoBtn = document.getElementById('takePhotoBtn');
+        const uploadPhotoBtn = document.getElementById('uploadPhotoBtn');
+        const wasteImageInputCamera = document.getElementById('wasteImageInputCamera');
+        const wasteImageInputUpload = document.getElementById('wasteImageInputUpload');
+        const wasteImagePreview = document.getElementById('wasteImagePreview');
+        const previewImage = document.getElementById('previewImage');
+        const classificationResult = document.getElementById('classificationResult');
+        const classificationError = document.getElementById('classificationError');
+        const errorMessage = document.getElementById('errorMessage');
+        const classifiedCategory = document.getElementById('classifiedCategory');
+        const classificationConfidence = document.getElementById('classificationConfidence');
+        const allPredictions = document.getElementById('allPredictions');
+        const useClassificationBtn = document.getElementById('useClassificationBtn');
+        const retakePhotoBtn = document.getElementById('retakePhotoBtn');
+        const wasteCategorySelect = document.getElementById('wasteCategorySelect');
+        
+        // Handle Take Photo button
+        if (takePhotoBtn && wasteImageInputCamera) {
+            takePhotoBtn.addEventListener('click', function() {
+                wasteImageInputCamera.click();
+            });
+        }
+        
+        // Handle Upload Photo button
+        if (uploadPhotoBtn && wasteImageInputUpload) {
+            uploadPhotoBtn.addEventListener('click', function() {
+                wasteImageInputUpload.click();
+            });
+        }
+        
+        // Handle file selection for camera
+        if (wasteImageInputCamera) {
+            wasteImageInputCamera.addEventListener('change', function(e) {
+                handleHouseholdImageSelection(e.target.files[0]);
+            });
+        }
+        
+        // Handle file selection for upload
+        if (wasteImageInputUpload) {
+            wasteImageInputUpload.addEventListener('change', function(e) {
+                handleHouseholdImageSelection(e.target.files[0]);
+            });
+        }
+        
+        function handleHouseholdImageSelection(file) {
+            if (!file) return;
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showClassificationError('Please select an image file');
+                return;
+            }
+            
+            // Validate file size (10MB max)
+            if (file.size > 10 * 1024 * 1024) {
+                showClassificationError('Image too large. Maximum size is 10MB');
+                return;
+            }
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                wasteImagePreview.style.display = 'block';
+                classificationResult.style.display = 'none';
+                classificationError.style.display = 'none';
+                
+                // Show loading state
+                if (takePhotoBtn) {
+                    takePhotoBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-translate="Classifying...">Classifying...</span>';
+                    takePhotoBtn.disabled = true;
+                }
+                if (uploadPhotoBtn) {
+                    uploadPhotoBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-translate="Classifying...">Classifying...</span>';
+                    uploadPhotoBtn.disabled = true;
+                }
+                
+                // Classify the image
+                classifyWasteImage(file);
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Use classification result
+        if (useClassificationBtn) {
+            useClassificationBtn.addEventListener('click', function() {
+                const categoryId = this.getAttribute('data-category-id');
+                if (categoryId && wasteCategorySelect) {
+                    wasteCategorySelect.value = categoryId;
+                    wasteCategorySelect.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+        
+        // Retake photo
+        if (retakePhotoBtn) {
+            retakePhotoBtn.addEventListener('click', function() {
+                if (wasteImageInputCamera) wasteImageInputCamera.value = '';
+                if (wasteImageInputUpload) wasteImageInputUpload.value = '';
+                wasteImagePreview.style.display = 'none';
+                if (takePhotoBtn) {
+                    takePhotoBtn.innerHTML = '<i class="fas fa-camera"></i> <span data-translate="Take Photo">Take Photo</span>';
+                    takePhotoBtn.disabled = false;
+                }
+                if (uploadPhotoBtn) {
+                    uploadPhotoBtn.innerHTML = '<i class="fas fa-upload"></i> <span data-translate="Upload Photo">Upload Photo</span>';
+                    uploadPhotoBtn.disabled = false;
+                }
+            });
+        }
+        
+        function classifyWasteImage(file) {
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            const csrftoken = getCookie('csrftoken');
+            
+            fetch('/api/classify-waste/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (takePhotoBtn) {
+                    takePhotoBtn.innerHTML = '<i class="fas fa-camera"></i> <span data-translate="Take Photo">Take Photo</span>';
+                    takePhotoBtn.disabled = false;
+                }
+                if (uploadPhotoBtn) {
+                    uploadPhotoBtn.innerHTML = '<i class="fas fa-upload"></i> <span data-translate="Upload Photo">Upload Photo</span>';
+                    uploadPhotoBtn.disabled = false;
+                }
+                
+                if (data.success && data.category_id) {
+                    // Show success result
+                    classificationResult.style.display = 'block';
+                    classificationError.style.display = 'none';
+                    
+                    classifiedCategory.textContent = data.category_name || data.category;
+                    classificationConfidence.textContent = `(${(data.confidence * 100).toFixed(0)}% confidence)`;
+                    
+                    // Show all predictions
+                    if (data.all_predictions && data.all_predictions.length > 0) {
+                        const predictionsHtml = data.all_predictions.map(p => 
+                            `${p.category}: ${(p.confidence * 100).toFixed(0)}%`
+                        ).join(' | ');
+                        allPredictions.textContent = 'Other possibilities: ' + predictionsHtml;
+                    }
+                    
+                    // Set category ID for use button
+                    if (useClassificationBtn) {
+                        useClassificationBtn.setAttribute('data-category-id', data.category_id);
+                    }
+                } else {
+                    showClassificationError(data.error || 'Could not classify waste. Please try again or select manually.');
+                }
+            })
+            .catch(error => {
+                console.error('Classification error:', error);
+                if (takePhotoBtn) {
+                    takePhotoBtn.innerHTML = '<i class="fas fa-camera"></i> <span data-translate="Take Photo">Take Photo</span>';
+                    takePhotoBtn.disabled = false;
+                }
+                if (uploadPhotoBtn) {
+                    uploadPhotoBtn.innerHTML = '<i class="fas fa-upload"></i> <span data-translate="Upload Photo">Upload Photo</span>';
+                    uploadPhotoBtn.disabled = false;
+                }
+                showClassificationError('Error classifying image. Please try again or select manually.');
+            });
+        }
+        
+        function showClassificationError(message) {
+            classificationError.style.display = 'block';
+            classificationResult.style.display = 'none';
+            errorMessage.textContent = message;
         }
 
         // Mobile sidebar toggle

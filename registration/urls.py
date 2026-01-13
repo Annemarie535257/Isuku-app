@@ -75,4 +75,7 @@ urlpatterns = [
     path('api/nearby-collectors/', views.get_nearby_collectors, name='nearby_collectors'),
     path('api/nearby-pickups/', views.get_nearby_pickups, name='nearby_pickups'),
     path('api/update-location/', views.update_location, name='update_location'),
+    
+    # AI waste classification endpoint
+    path('api/classify-waste/', views.classify_waste_image, name='classify_waste'),
 ]

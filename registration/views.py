@@ -13,10 +13,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.models import User
 import json
+import logging
 from .models import (
     Household, Collector, Admin, Province, District, Sector, Cell, Village,
     WasteCategory, WastePickupRequest, Notification, OTP
 )
+
+logger = logging.getLogger(__name__)
 
 
 def set_language(request):
@@ -1429,6 +1432,74 @@ def chatbot_api(request):
     except Exception as e:
         return JsonResponse({
             'error': f'Error processing request: {str(e)}',
+            'success': False
+        }, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def classify_waste_image(request):
+    """Classify waste from uploaded image"""
+    try:
+        if 'image' not in request.FILES:
+            return JsonResponse({
+                'error': 'No image provided',
+                'success': False
+            }, status=400)
+        
+        image_file = request.FILES['image']
+        
+        # Validate image
+        if image_file.size > 10 * 1024 * 1024:  # 10MB limit
+            return JsonResponse({
+                'error': 'Image too large. Maximum size is 10MB',
+                'success': False
+            }, status=400)
+        
+        # Read image bytes
+        image_bytes = image_file.read()
+        
+        # Classify waste
+        try:
+            from .waste_classifier import get_waste_classifier
+            classifier = get_waste_classifier()
+            result = classifier.classify_from_bytes(image_bytes)
+        except Exception as e:
+            logger.error(f"Error importing or using waste classifier: {e}")
+            # Return a default classification
+            result = {
+                'category': 'General Waste',
+                'confidence': 0.5,
+                'all_predictions': [],
+                'success': False,
+                'error': 'Classification service temporarily unavailable'
+            }
+        
+        # Map category name to category ID
+        if result['success']:
+            from .models import WasteCategory
+            try:
+                category = WasteCategory.objects.get(name=result['category'])
+                result['category_id'] = category.id
+                result['category_name'] = category.name
+                result['category_color'] = category.color_code
+                result['category_icon'] = category.icon or category.get_icon()
+            except WasteCategory.DoesNotExist:
+                # Fallback to General Waste
+                category = WasteCategory.objects.filter(name='General Waste').first()
+                if category:
+                    result['category_id'] = category.id
+                    result['category_name'] = category.name
+                else:
+                    result['category_id'] = None
+        
+        return JsonResponse(result, status=200)
+        
+    except Exception as e:
+        import traceback
+        logger.error(f"Error classifying waste image: {e}\n{traceback.format_exc()}")
+        return JsonResponse({
+            'error': f'Error processing image: {str(e)}',
             'success': False
         }, status=500)
 

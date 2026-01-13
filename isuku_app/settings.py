@@ -208,6 +208,12 @@ LOGGING = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Ensure media directory exists
+try:
+    os.makedirs(MEDIA_ROOT, exist_ok=True)
+except Exception:
+    pass  # Best effort - will fail later if needed
+
 # Email Configuration
 # For development: emails are printed to console (check your terminal)
 # For production: configure SMTP settings below
