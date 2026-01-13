@@ -6,8 +6,13 @@
     <title>{% block title %}Isuku - Waste Management System{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS and JS for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Load translations early to ensure availability on user interaction -->
     <script src="{{ static('js/translations.js') }}"></script>
+    <!-- Map utilities -->
+    <script src="{{ static('js/map_utils.js') }}"></script>
     <script>
         // Ensure TranslationManager initializes immediately after loading
         (function() {

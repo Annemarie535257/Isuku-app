@@ -67,4 +67,12 @@ urlpatterns = [
     path('api/request-otp/', views.request_otp, name='request_otp'),
     path('api/verify-otp/', views.verify_otp, name='verify_otp'),
     path('api/resend-otp/', views.resend_otp, name='resend_otp'),
+    
+    # Chatbot endpoint
+    path('api/chatbot/', views.chatbot_api, name='chatbot_api'),
+    
+    # Geolocation and map endpoints
+    path('api/nearby-collectors/', views.get_nearby_collectors, name='nearby_collectors'),
+    path('api/nearby-pickups/', views.get_nearby_pickups, name='nearby_pickups'),
+    path('api/update-location/', views.update_location, name='update_location'),
 ]

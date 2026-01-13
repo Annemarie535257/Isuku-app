@@ -55,12 +55,18 @@ class Household(models.Model):
     cell = models.ForeignKey(Cell, on_delete=models.SET_NULL, null=True, blank=True)
     village = models.ForeignKey(Village, on_delete=models.SET_NULL, null=True, blank=True)
     street_address = models.CharField(max_length=255, blank=True)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, help_text="Latitude coordinate")
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, help_text="Longitude coordinate")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_verified = models.BooleanField(default=False)
     
     def __str__(self):
         return f"{self.user.get_full_name() or self.user.username} - Household"
+    
+    def has_location(self):
+        """Check if household has valid coordinates"""
+        return self.latitude is not None and self.longitude is not None
 
 
 class Collector(models.Model):
@@ -73,6 +79,9 @@ class Collector(models.Model):
     vehicle_number = models.CharField(max_length=50, blank=True, null=True)
     province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True)
     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, blank=True)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, help_text="Latitude coordinate")
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, help_text="Longitude coordinate")
+    service_radius = models.DecimalField(max_digits=5, decimal_places=2, default=10.00, help_text="Service radius in kilometers")
     is_verified = models.BooleanField(default=False)
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -80,6 +89,10 @@ class Collector(models.Model):
     
     def __str__(self):
         return f"{self.user.get_full_name() or self.user.username} - Collector"
+    
+    def has_location(self):
+        """Check if collector has valid coordinates"""
+        return self.latitude is not None and self.longitude is not None
 
 
 class Admin(models.Model):
@@ -109,9 +122,26 @@ class WasteCategory(models.Model):
     description = models.TextField(blank=True)
     color_code = models.CharField(max_length=20, default='#000000')
     icon = models.CharField(max_length=50, blank=True)
+    image = models.ImageField(upload_to='waste_categories/', blank=True, null=True, help_text="Image for waste category")
     
     def __str__(self):
         return self.name
+    
+    def get_icon(self):
+        """Get icon class, with fallback mapping"""
+        if self.icon:
+            return self.icon
+        
+        # Default icon mapping based on category name
+        icon_map = {
+            'Organic Waste': 'fa-leaf',
+            'Plastic Waste': 'fa-wine-bottle',
+            'Paper Waste': 'fa-file-alt',
+            'Glass Waste': 'fa-wine-glass',
+            'Metal Waste': 'fa-cog',
+            'General Waste': 'fa-trash-alt',
+        }
+        return icon_map.get(self.name, 'fa-trash-alt')
 
 
 class WastePickupRequest(models.Model):
@@ -133,12 +163,18 @@ class WastePickupRequest(models.Model):
     scheduled_date = models.DateTimeField(null=True, blank=True)
     completed_date = models.DateTimeField(null=True, blank=True)
     address = models.TextField()
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, help_text="Pickup location latitude")
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, help_text="Pickup location longitude")
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return f"Pickup Request #{self.id} - {self.household.user.username} - {self.status}"
+    
+    def has_location(self):
+        """Check if pickup request has valid coordinates"""
+        return self.latitude is not None and self.longitude is not None
 
 
 class Notification(models.Model):

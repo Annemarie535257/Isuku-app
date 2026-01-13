@@ -395,6 +395,20 @@
 
         <!-- Stats -->
         <div class="dashboard-content">
+            <!-- Map Section -->
+            <div class="content-card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <h2 class="card-title" data-translate="Nearby Pickup Requests">Nearby Pickup Requests</h2>
+                    <button id="updateCollectorLocationBtn" class="btn-primary" style="padding: 8px 16px; font-size: 14px;">
+                        <i class="fas fa-map-marker-alt"></i> <span data-translate="Update My Location">Update My Location</span>
+                    </button>
+                </div>
+                <div id="collectorMap" style="height: 400px; border-radius: 8px; margin-top: 16px;"></div>
+                <div id="nearbyPickups" style="margin-top: 16px; padding: 16px; background: #f9fafb; border-radius: 8px; display: none;">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;" data-translate="Available Pickups Near You">Available Pickups Near You</h3>
+                    <div id="pickupsList"></div>
+                </div>
+            </div>
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-card-header">
@@ -632,6 +646,99 @@
             profileDropdown.addEventListener('click', function (e) {
                 e.stopPropagation();
             });
+        }
+        
+        // Initialize collector dashboard map
+        if (document.getElementById('collectorMap')) {
+            const collectorMap = initMap('collectorMap', { zoom: 13 });
+            let collectorMarker = null;
+            let pickupMarkers = [];
+            
+            // Get current location and update map
+            function updateCollectorLocation() {
+                getCurrentLocation(function(location) {
+                    if (location.success) {
+                        collectorMap.setView([location.lat, location.lon], 13);
+                        
+                        // Remove old marker
+                        if (collectorMarker) {
+                            collectorMap.removeLayer(collectorMarker);
+                        }
+                        
+                        // Add collector location marker
+                        collectorMarker = addMarker(
+                            collectorMap, 
+                            location.lat, 
+                            location.lon, 
+                            'Your Location', 
+                            '#059669'
+                        );
+                        
+                        // Update location via API
+                        updateLocation(location.lat, location.lon, 'collector').then(function(result) {
+                            if (result.success) {
+                                // Load nearby pickups
+                                loadNearbyPickups(location.lat, location.lon);
+                            }
+                        });
+                    }
+                });
+            }
+            
+            // Load nearby pickups
+            function loadNearbyPickups(lat, lon) {
+                // Remove old pickup markers
+                pickupMarkers.forEach(marker => collectorMap.removeLayer(marker));
+                pickupMarkers = [];
+                
+                getNearbyPickups(lat, lon, 10).then(function(result) {
+                    if (result.success && result.pickups.length > 0) {
+                        const pickupsList = document.getElementById('pickupsList');
+                        const nearbyDiv = document.getElementById('nearbyPickups');
+                        
+                        pickupsList.innerHTML = '';
+                        result.pickups.forEach(function(pickup) {
+                            // Add marker
+                            const marker = addMarker(
+                                collectorMap,
+                                pickup.latitude,
+                                pickup.longitude,
+                                `${pickup.waste_category} - ${pickup.quantity}kg - ${pickup.distance_km}km away`,
+                                '#d97706'
+                            );
+                            pickupMarkers.push(marker);
+                            
+                            // Add to list
+                            const item = document.createElement('div');
+                            item.style.cssText = 'padding: 12px; margin-bottom: 8px; background: white; border-radius: 6px; border-left: 3px solid #d97706;';
+                            item.innerHTML = `
+                                <div style="font-weight: 600; color: #111827;">Pickup #${pickup.id} - ${pickup.waste_category}</div>
+                                <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+                                    <i class="fas fa-user"></i> ${pickup.household_name} | 
+                                    <i class="fas fa-weight"></i> ${pickup.quantity} kg | 
+                                    <i class="fas fa-map-marker-alt"></i> ${pickup.distance_km} km away
+                                </div>
+                                <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">${pickup.address}</div>
+                                <a href="/pickup/${pickup.id}/assign/" class="btn-primary" style="margin-top: 8px; padding: 6px 12px; font-size: 12px; display: inline-block;">
+                                    <i class="fas fa-check"></i> Assign to Me
+                                </a>
+                            `;
+                            pickupsList.appendChild(item);
+                        });
+                        
+                        nearbyDiv.style.display = 'block';
+                    }
+                });
+            }
+            
+            // Update location button
+            const updateBtn = document.getElementById('updateCollectorLocationBtn');
+            if (updateBtn) {
+                updateBtn.addEventListener('click', updateCollectorLocation);
+            }
+            
+            // Initial load
+            updateCollectorLocation();
         }
     });
 </script>

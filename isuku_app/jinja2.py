@@ -111,15 +111,16 @@ def environment(**options):
         value = value.replace('</', '<\\/')  # Closing script tag prevention
         return value
     
-    def waste_category_badge(category):
-        """Generate HTML badge for waste category with color and icon"""
+    def get_category_icon(category):
+        """Get icon for waste category with fallback"""
         if not category:
-            return ''
-        color = category.color_code if hasattr(category, 'color_code') else '#059669'
-        icon = category.icon if hasattr(category, 'icon') and category.icon else 'fa-trash-alt'
-        name = category.name if hasattr(category, 'name') else str(category)
+            return 'fa-trash-alt'
         
-        # Map common waste types to icons if not set
+        # Use icon if set
+        if hasattr(category, 'icon') and category.icon:
+            return category.icon
+        
+        # Map common waste types to icons
         icon_map = {
             'Organic Waste': 'fa-leaf',
             'Plastic Waste': 'fa-wine-bottle',
@@ -129,8 +130,16 @@ def environment(**options):
             'General Waste': 'fa-trash-alt',
         }
         
-        if not icon or icon == '':
-            icon = icon_map.get(name, 'fa-trash-alt')
+        name = category.name if hasattr(category, 'name') else str(category)
+        return icon_map.get(name, 'fa-trash-alt')
+    
+    def waste_category_badge(category):
+        """Generate HTML badge for waste category with color and icon"""
+        if not category:
+            return ''
+        color = category.color_code if hasattr(category, 'color_code') else '#059669'
+        icon = get_category_icon(category)
+        name = category.name if hasattr(category, 'name') else str(category)
         
         return f'<span class="waste-category-badge" style="background-color: {color}20; color: {color}; border: 1px solid {color}40; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;"><i class="fas {icon}"></i> {name}</span>'
     
@@ -138,6 +147,7 @@ def environment(**options):
     env.filters['format'] = format_filter
     env.filters['escapejs'] = escapejs_filter
     env.filters['waste_category_badge'] = waste_category_badge
+    env.filters['get_category_icon'] = get_category_icon
     
     env.globals.update({
         'static': static_file,

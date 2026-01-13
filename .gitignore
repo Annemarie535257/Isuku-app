@@ -46,4 +46,19 @@ ENV/
 Thumbs.db
 
 # Project specific
+# AI Chatbot model files (too large for git)
+AI_Chatbot/models/
+AI_Chatbot/venv/
+AI_Chatbot/__pycache__/
+*.pth
+*.bin
+*.safetensors
+*.pt
+*.ckpt
 
+# But keep the notebook and dataset
+!AI_Chatbot/train_llama_chatbot.ipynb
+!AI_Chatbot/Dataset/
+!AI_Chatbot/README.md
+!AI_Chatbot/requirements.txt
+!AI_Chatbot/setup_venv.sh

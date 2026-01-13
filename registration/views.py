@@ -1204,18 +1204,33 @@ def admin_quick_actions(request):
 # Utility views
 @login_required
 def create_pickup_request(request):
-    """Create a new pickup request"""
+    """Create a new waste pickup request with geocoding"""
     if request.method == 'POST':
         try:
             household = request.user.household_profile
+            address = request.POST.get('address', household.street_address)
+            lat = request.POST.get('latitude')
+            lon = request.POST.get('longitude')
+            
             pickup_request = WastePickupRequest.objects.create(
                 household=household,
                 waste_category_id=request.POST.get('waste_category'),
                 quantity=request.POST.get('quantity', 0),
-                address=request.POST.get('address', household.street_address),
+                address=address,
                 notes=request.POST.get('notes', ''),
+                latitude=float(lat) if lat else None,
+                longitude=float(lon) if lon else None,
             )
-            messages.success(request, "Pickup request created successfully!")
+            
+            # Try to auto-assign nearest collector
+            from .geocoding import auto_assign_collector
+            if pickup_request.has_location():
+                if auto_assign_collector(pickup_request):
+                    messages.success(request, "Pickup request created and collector assigned automatically!")
+                else:
+                    messages.success(request, "Pickup request created! A collector will be assigned soon.")
+            else:
+                messages.success(request, "Pickup request created successfully!")
         except Household.DoesNotExist:
             messages.error(request, "Household profile not found.")
         except Exception as e:
@@ -1379,6 +1394,206 @@ def verify_otp(request):
         return JsonResponse({"error": "Invalid JSON format"}, status=400)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def chatbot_api(request):
+    """API endpoint for chatbot queries"""
+    try:
+        data = json.loads(request.body)
+        question = data.get('question', '').strip()
+        
+        if not question:
+            return JsonResponse({
+                'error': 'Question is required',
+                'success': False
+            }, status=400)
+        
+        # Import chatbot service
+        from .chatbot_service import generate_response
+        
+        # Generate response
+        response = generate_response(question, max_length=256, temperature=0.7)
+        
+        return JsonResponse({
+            'response': response,
+            'success': True
+        }, status=200)
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'error': 'Invalid JSON format',
+            'success': False
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Error processing request: {str(e)}',
+            'success': False
+        }, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+@login_required
+def update_location(request):
+    """Update location coordinates for household or collector"""
+    try:
+        data = json.loads(request.body)
+        lat = data.get('latitude')
+        lon = data.get('longitude')
+        user_type = data.get('user_type', 'household')  # 'household' or 'collector'
+        
+        if not lat or not lon:
+            return JsonResponse({
+                'error': 'Latitude and longitude are required',
+                'success': False
+            }, status=400)
+        
+        if user_type == 'household':
+            try:
+                household = request.user.household_profile
+                household.latitude = float(lat)
+                household.longitude = float(lon)
+                household.save()
+                return JsonResponse({
+                    'message': 'Location updated successfully',
+                    'success': True
+                }, status=200)
+            except Household.DoesNotExist:
+                return JsonResponse({
+                    'error': 'Household profile not found',
+                    'success': False
+                }, status=404)
+        elif user_type == 'collector':
+            try:
+                collector = request.user.collector_profile
+                collector.latitude = float(lat)
+                collector.longitude = float(lon)
+                collector.save()
+                return JsonResponse({
+                    'message': 'Location updated successfully',
+                    'success': True
+                }, status=200)
+            except Collector.DoesNotExist:
+                return JsonResponse({
+                    'error': 'Collector profile not found',
+                    'success': False
+                }, status=404)
+        else:
+            return JsonResponse({
+                'error': 'Invalid user type',
+                'success': False
+            }, status=400)
+            
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'error': 'Invalid JSON format',
+            'success': False
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Error updating location: {str(e)}',
+            'success': False
+        }, status=500)
+
+
+@require_http_methods(["GET"])
+@login_required
+def get_nearby_collectors(request):
+    """Get nearby collectors for a household"""
+    try:
+        household = request.user.household_profile
+        
+        if not household.has_location():
+            return JsonResponse({
+                'error': 'Household location not set',
+                'success': False
+            }, status=400)
+        
+        from .geocoding import find_nearby_collectors
+        max_distance = float(request.GET.get('max_distance', 10.0))
+        
+        nearby = find_nearby_collectors(
+            float(household.latitude),
+            float(household.longitude),
+            max_distance_km=max_distance
+        )
+        
+        collectors_data = [{
+            'id': item['collector'].id,
+            'name': item['collector'].user.get_full_name() or item['collector'].user.username,
+            'phone': item['collector'].phone_number,
+            'distance_km': item['distance_km'],
+            'latitude': float(item['collector'].latitude),
+            'longitude': float(item['collector'].longitude),
+        } for item in nearby]
+        
+        return JsonResponse({
+            'collectors': collectors_data,
+            'success': True
+        }, status=200)
+        
+    except Household.DoesNotExist:
+        return JsonResponse({
+            'error': 'Household profile not found',
+            'success': False
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Error: {str(e)}',
+            'success': False
+        }, status=500)
+
+
+@require_http_methods(["GET"])
+@login_required
+def get_nearby_pickups(request):
+    """Get nearby pickup requests for a collector"""
+    try:
+        collector = request.user.collector_profile
+        
+        if not collector.has_location():
+            return JsonResponse({
+                'error': 'Collector location not set',
+                'success': False
+            }, status=400)
+        
+        from .geocoding import find_nearby_pickups
+        max_distance = float(request.GET.get('max_distance', 10.0))
+        
+        nearby = find_nearby_pickups(
+            float(collector.latitude),
+            float(collector.longitude),
+            max_distance_km=max_distance
+        )
+        
+        pickups_data = [{
+            'id': item['pickup'].id,
+            'household_name': item['pickup'].household.user.get_full_name() or item['pickup'].household.user.username,
+            'address': item['pickup'].address,
+            'waste_category': item['pickup'].waste_category.name,
+            'quantity': float(item['pickup'].quantity),
+            'distance_km': item['distance_km'],
+            'latitude': float(item['pickup'].latitude),
+            'longitude': float(item['pickup'].longitude),
+        } for item in nearby]
+        
+        return JsonResponse({
+            'pickups': pickups_data,
+            'success': True
+        }, status=200)
+        
+    except Collector.DoesNotExist:
+        return JsonResponse({
+            'error': 'Collector profile not found',
+            'success': False
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Error: {str(e)}',
+            'success': False
+        }, status=500)
 
 
 class CustomPasswordResetView(PasswordResetView):
