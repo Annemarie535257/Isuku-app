@@ -211,31 +211,11 @@
         display: none !important;
     }
     
-    #languageMenu:not(.hidden) {
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-    
-    /* Ensure menu items are visible when menu is shown */
-    #languageMenu:not(.hidden) a {
-        display: flex !important;
-        align-items: center !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: relative !important;
-        z-index: 1 !important;
-    }
-    
-    #languageMenu a {
-        display: flex;
-        align-items: center;
-    }
-    
     /* Override any Tailwind hidden class */
     #languageMenu.hidden {
         display: none !important;
         visibility: hidden !important;
+        opacity: 0 !important;
     }
     
     /* Ensure menu container is visible when not hidden */
@@ -245,6 +225,27 @@
         opacity: 1 !important;
         position: absolute !important;
         z-index: 9999 !important;
+        top: 100% !important;
+        right: 0 !important;
+        margin-top: 0.5rem !important;
+    }
+    
+    /* Ensure menu items are visible */
+    #languageMenu a {
+        display: flex !important;
+        align-items: center !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: relative !important;
+        z-index: 1 !important;
+    }
+    
+    /* Ensure menu items are visible when menu is shown */
+    #languageMenu:not(.hidden) a {
+        display: flex !important;
+        align-items: center !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
     
     #languageMenu a:hover {
@@ -1096,22 +1097,15 @@
         console.log('Toggling language menu, currently hidden:', isHidden);
         
         if (isHidden) {
-            // Show menu - remove all hiding styles
+            // Show menu
             menu.classList.remove('hidden');
-            menu.removeAttribute('style'); // Remove inline styles
-            menu.style.display = 'block';
-            menu.style.visibility = 'visible';
-            menu.style.opacity = '1';
-            menu.style.position = 'absolute';
-            menu.style.zIndex = '9999';
+            menu.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: absolute !important; z-index: 9999 !important; top: 100% !important; right: 0 !important; margin-top: 0.5rem !important;';
             console.log('Menu shown - display:', menu.style.display, 'visibility:', menu.style.visibility);
             console.log('Menu computed style:', window.getComputedStyle(menu).display);
             console.log('Menu children count:', menu.children.length);
             // Force visibility on all children (language options)
             Array.from(menu.children).forEach((child, index) => {
-                child.style.display = 'flex';
-                child.style.visibility = 'visible';
-                child.style.opacity = '1';
+                child.style.cssText = 'display: flex !important; visibility: visible !important; opacity: 1 !important;';
                 console.log(`Child ${index} (${child.textContent.trim()}) - display:`, window.getComputedStyle(child).display);
             });
         } else {
@@ -1260,23 +1254,60 @@
         observer.observe(card);
     });
     
-    // Initialize landing page map
-    if (document.getElementById('landingMap')) {
-        const landingMap = initMap('landingMap', { zoom: 12 });
+    // Initialize landing page map - wait for DOM and Leaflet to be ready
+    function initializeLandingMap() {
+        const mapElement = document.getElementById('landingMap');
+        if (!mapElement) {
+            console.warn('Landing map element not found');
+            return;
+        }
         
-        // Add default marker for Kigali
-        addMarker(landingMap, -1.9441, 30.0619, 'Isuku Service Area - Kigali, Rwanda', '#059669');
+        // Check if Leaflet is loaded
+        if (typeof L === 'undefined') {
+            console.error('Leaflet is not loaded. Make sure Leaflet JS is included before this script.');
+            // Retry after a short delay
+            setTimeout(initializeLandingMap, 500);
+            return;
+        }
         
-        // Try to get user location and show nearby collectors
-        getCurrentLocation(function(location) {
-            if (location.success) {
-                landingMap.setView([location.lat, location.lon], 13);
-                addMarker(landingMap, location.lat, location.lon, 'Your Location', '#2563eb');
-                
-                // Show nearby collectors if user is logged in
-                // This would require authentication check
+        // Check if map utilities are loaded
+        if (typeof initMap === 'undefined') {
+            console.error('initMap function is not defined. Make sure map_utils.js is loaded.');
+            // Retry after a short delay
+            setTimeout(initializeLandingMap, 500);
+            return;
+        }
+        
+        try {
+            const landingMap = initMap('landingMap', { zoom: 12 });
+            
+            // Add default marker for Kigali
+            if (typeof addMarker !== 'undefined') {
+                addMarker(landingMap, -1.9441, 30.0619, 'Isuku Service Area - Kigali, Rwanda', '#059669');
             }
-        });
+            
+            // Try to get user location and show nearby collectors
+            if (typeof getCurrentLocation !== 'undefined') {
+                getCurrentLocation(function(location) {
+                    if (location.success && landingMap) {
+                        landingMap.setView([location.lat, location.lon], 13);
+                        if (typeof addMarker !== 'undefined') {
+                            addMarker(landingMap, location.lat, location.lon, 'Your Location', '#2563eb');
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error initializing landing map:', error);
+        }
+    }
+    
+    // Initialize map when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeLandingMap);
+    } else {
+        // DOM is already ready, but wait a bit for scripts to load
+        setTimeout(initializeLandingMap, 100);
     }
     
     // Landing Page Waste Classifier
@@ -1792,6 +1823,10 @@
                     body: JSON.stringify({ question: question })
                 });
                 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
                 // Remove loading message
@@ -1800,12 +1835,22 @@
                 if (data.success) {
                     addMessage(data.response, 'bot');
                 } else {
-                    addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+                    const errorMsg = data.error || 'Sorry, I encountered an error. Please try again.';
+                    addMessage(errorMsg, 'bot');
+                    console.error('Chatbot error:', errorMsg);
                 }
             } catch (error) {
                 loadingMsg.remove();
-                addMessage('Sorry, I\'m having trouble connecting. Please try again later.', 'bot');
-                console.error('Chatbot error:', error);
+                console.error('Chatbot request error:', error);
+                let errorMessage = 'Sorry, I encountered an error connecting to the chatbot. ';
+                if (error.message && error.message.includes('Failed to fetch')) {
+                    errorMessage += 'Please check your internet connection and try again.';
+                } else if (error.message && error.message.includes('HTTP error')) {
+                    errorMessage += 'The server encountered an error. Please try again later.';
+                } else {
+                    errorMessage += 'Please try again later or contact support.';
+                }
+                addMessage(errorMessage, 'bot');
             } finally {
                 chatbotSend.disabled = false;
                 chatbotInput.focus();
