@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.views import PasswordResetView
 from django.contrib import messages
-from django.db import transaction
+from django.db import transaction, OperationalError
 from django.db.models import Q, Count
 from django.http import JsonResponse, HttpResponseRedirect
 from django.utils import translation, timezone
@@ -40,8 +40,20 @@ def set_language(request):
 def landing_page(request):
     """Landing page view"""
     from django.contrib.messages import get_messages
+    
     provinces = Province.objects.all()
-    waste_categories = WasteCategory.objects.all()
+    
+    # Handle case where WasteCategory table doesn't exist yet (migrations not run)
+    try:
+        waste_categories = WasteCategory.objects.all()
+    except OperationalError as e:
+        # Table doesn't exist yet - return empty queryset
+        logger.warning(f"WasteCategory table not found. Migrations may need to be run. Error: {e}")
+        waste_categories = WasteCategory.objects.none()
+    except Exception as e:
+        # Any other error - log and return empty queryset
+        logger.error(f"Error loading waste categories: {e}")
+        waste_categories = WasteCategory.objects.none()
     
     context = {
         'messages': list(get_messages(request)),

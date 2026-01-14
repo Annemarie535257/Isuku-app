@@ -207,13 +207,44 @@
         box-shadow: 0 10px 40px rgba(5, 150, 105, 0.15);
     }
     
+    #languageMenu.hidden {
+        display: none !important;
+    }
+    
     #languageMenu:not(.hidden) {
         display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    /* Ensure menu items are visible when menu is shown */
+    #languageMenu:not(.hidden) a {
+        display: flex !important;
+        align-items: center !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: relative !important;
+        z-index: 1 !important;
     }
     
     #languageMenu a {
         display: flex;
         align-items: center;
+    }
+    
+    /* Override any Tailwind hidden class */
+    #languageMenu.hidden {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
+    /* Ensure menu container is visible when not hidden */
+    #languageMenu:not(.hidden) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: absolute !important;
+        z-index: 9999 !important;
     }
     
     #languageMenu a:hover {
@@ -473,7 +504,7 @@
                         <span data-translate="LANGUAGE" class="language-text">LANGUAGE</span>
                         <i class="fas fa-chevron-down text-xs transition-transform duration-300 language-chevron"></i>
                     </button>
-                    <div id="languageMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border-2 border-green-100 py-2 z-50 overflow-hidden language-menu">
+                    <div id="languageMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border-2 border-green-100 py-2 z-[9999] language-menu">
                         <a href="#" class="language-option block px-5 py-3 text-gray-700 hover:bg-green-50 hover:text-green-primary transition-all duration-200 flex items-center space-x-3 group" onclick="changeLanguage('en'); return false;">
                             <span class="text-2xl transform group-hover:scale-110 transition-transform duration-200">🇬🇧</span>
                             <span class="font-medium flex-1">English</span>
@@ -1049,6 +1080,116 @@
 
 <!-- Smooth Scroll and Interactive Scripts -->
 <script>
+    // Make functions globally accessible
+    window.toggleLanguageDropdown = function(event) {
+        if (event) {
+            event.stopPropagation();
+        }
+        const menu = document.getElementById('languageMenu');
+        if (!menu) {
+            console.error('Language menu not found');
+            return;
+        }
+        
+        // Toggle visibility - force display changes
+        const isHidden = menu.classList.contains('hidden');
+        console.log('Toggling language menu, currently hidden:', isHidden);
+        
+        if (isHidden) {
+            // Show menu - remove all hiding styles
+            menu.classList.remove('hidden');
+            menu.removeAttribute('style'); // Remove inline styles
+            menu.style.display = 'block';
+            menu.style.visibility = 'visible';
+            menu.style.opacity = '1';
+            menu.style.position = 'absolute';
+            menu.style.zIndex = '9999';
+            console.log('Menu shown - display:', menu.style.display, 'visibility:', menu.style.visibility);
+            console.log('Menu computed style:', window.getComputedStyle(menu).display);
+            console.log('Menu children count:', menu.children.length);
+            // Force visibility on all children (language options)
+            Array.from(menu.children).forEach((child, index) => {
+                child.style.display = 'flex';
+                child.style.visibility = 'visible';
+                child.style.opacity = '1';
+                console.log(`Child ${index} (${child.textContent.trim()}) - display:`, window.getComputedStyle(child).display);
+            });
+        } else {
+            // Hide menu
+            menu.classList.add('hidden');
+            menu.style.display = 'none';
+            menu.style.visibility = 'hidden';
+            menu.style.opacity = '0';
+            console.log('Menu hidden');
+        }
+        
+        // Rotate chevron
+        const chevron = document.querySelector('.language-chevron');
+        if (chevron) {
+            if (isHidden) {
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+    };
+    
+    window.changeLanguage = function(lang) {
+        console.log('🌐 changeLanguage called with:', lang);
+        
+        // Close dropdown
+        const menu = document.getElementById('languageMenu');
+        if (menu) {
+            menu.classList.add('hidden');
+            menu.style.display = 'none';
+        }
+        
+        // Reset chevron
+        const chevron = document.querySelector('.language-chevron');
+        if (chevron) {
+            chevron.style.transform = 'rotate(0deg)';
+        }
+        
+        // Ensure TranslationManager exists; if not, wait for it or load it dynamically
+        if (!window.TranslationManager) {
+            console.warn('TranslationManager not found; waiting for it to load...');
+            // Wait for TranslationManager to be available (with timeout)
+            let attempts = 0;
+            const maxAttempts = 50; // Wait up to 5 seconds (50 * 100ms)
+            const checkInterval = setInterval(() => {
+                attempts++;
+                if (window.TranslationManager && typeof window.TranslationManager.setLanguage === 'function') {
+                    clearInterval(checkInterval);
+                    console.log('✅ TranslationManager found, setting language to:', lang);
+                    const success = window.TranslationManager.setLanguage(lang);
+                    if (success) {
+                        setTimeout(() => {
+                            if (window.TranslationManager && typeof window.TranslationManager.applyTranslations === 'function') {
+                                window.TranslationManager.applyTranslations();
+                            }
+                        }, 200);
+                    }
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(checkInterval);
+                    console.error('❌ TranslationManager failed to load after', maxAttempts, 'attempts');
+                    alert('Language feature is loading. Please refresh the page and try again.');
+                }
+            }, 100);
+        } else {
+            console.log('TranslationManager available, setting language to:', lang);
+            const success = window.TranslationManager.setLanguage(lang);
+            if (success) {
+                setTimeout(() => {
+                    if (window.TranslationManager && typeof window.TranslationManager.applyTranslations === 'function') {
+                        window.TranslationManager.applyTranslations();
+                    }
+                }, 200);
+            } else {
+                console.error('Failed to set language:', lang);
+            }
+        }
+    };
+    
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
@@ -1066,38 +1207,6 @@
         });
     });
 
-    // Language dropdown toggle
-    function toggleLanguageDropdown(event) {
-        if (event) {
-            event.stopPropagation();
-        }
-        const menu = document.getElementById('languageMenu');
-        if (!menu) {
-            console.error('Language menu not found');
-            return;
-        }
-        
-        // Toggle visibility
-        const isHidden = menu.classList.contains('hidden');
-        if (isHidden) {
-            menu.classList.remove('hidden');
-            menu.style.display = 'block';
-        } else {
-            menu.classList.add('hidden');
-            menu.style.display = 'none';
-        }
-        
-        // Rotate chevron
-        const chevron = document.querySelector('.language-chevron');
-        if (chevron) {
-            if (isHidden) {
-                chevron.style.transform = 'rotate(180deg)';
-            } else {
-                chevron.style.transform = 'rotate(0deg)';
-            }
-        }
-    }
-    
     // Close language dropdown when clicking outside
     document.addEventListener('click', function(event) {
         const dropdown = document.querySelector('.language-dropdown');
@@ -1128,76 +1237,6 @@
         return cookieValue;
     }
     
-    // Change language function - uses JavaScript translation
-    function changeLanguage(lang) {
-        console.log('🌐 changeLanguage called with:', lang);
-        
-        // Close dropdown
-        const menu = document.getElementById('languageMenu');
-        if (menu) {
-            menu.classList.add('hidden');
-            menu.style.display = 'none';
-        }
-        
-        // Reset chevron
-        const chevron = document.querySelector('.language-chevron');
-        if (chevron) {
-            chevron.style.transform = 'rotate(0deg)';
-        }
-        
-        // Ensure TranslationManager exists; if not, wait for it or load it dynamically
-        if (!window.TranslationManager) {
-            console.warn('TranslationManager not found; waiting for it to load...');
-            // Wait for TranslationManager to be available (with timeout)
-            let attempts = 0;
-            const maxAttempts = 20; // Wait up to 2 seconds (20 * 100ms)
-            const checkInterval = setInterval(() => {
-                attempts++;
-                if (window.TranslationManager) {
-                    clearInterval(checkInterval);
-                    const success = window.TranslationManager.setLanguage(lang);
-                    if (success) {
-                        setTimeout(() => window.TranslationManager.applyTranslations(), 200);
-                    }
-                } else if (attempts >= maxAttempts) {
-                    clearInterval(checkInterval);
-                    console.error('TranslationManager failed to load');
-                    // Try loading script dynamically as fallback
-                    const scriptUrl = "{{ static('js/translations.js') }}";
-                    const s = document.createElement('script');
-                    s.src = scriptUrl;
-                    s.onload = function () {
-                        if (window.TranslationManager) {
-                            window.TranslationManager.setLanguage(lang);
-                            setTimeout(() => window.TranslationManager.applyTranslations(), 200);
-                        }
-                    };
-                    s.onerror = function () {
-                        console.error('Failed to load translations.js from:', scriptUrl);
-                    };
-                    document.head.appendChild(s);
-                }
-            }, 100);
-            return;
-        }
-        
-        // Change language when TranslationManager is available
-        try {
-            const success = window.TranslationManager.setLanguage(lang);
-            if (success) {
-                setTimeout(() => {
-                    if (window.TranslationManager) {
-                        window.TranslationManager.applyTranslations();
-                    }
-                }, 200);
-            } else {
-                console.error('Failed to set language:', lang);
-            }
-        } catch (error) {
-            console.error('Error changing language:', error);
-        }
-    }
-
     // Intersection Observer for animations
     const observerOptions = {
         threshold: 0.1,
@@ -1241,8 +1280,6 @@
     }
     
     // Landing Page Waste Classifier
-    const landingClassifyWasteBtn = document.getElementById('landingClassifyWasteBtn');
-    const landingWasteImageInput = document.getElementById('landingWasteImageInput');
     const landingWasteImagePreview = document.getElementById('landingWasteImagePreview');
     const landingPreviewImage = document.getElementById('landingPreviewImage');
     const landingClassificationResult = document.getElementById('landingClassificationResult');
@@ -1301,8 +1338,6 @@
     
     function handleLandingImageSelection(file) {
         if (!file) return;
-            const file = e.target.files[0];
-            if (!file) return;
             
         // Validate file type
         if (!file.type.startsWith('image/')) {
@@ -1361,7 +1396,12 @@
         // Error retry
         if (landingErrorRetryBtn) {
             landingErrorRetryBtn.addEventListener('click', function() {
-                landingWasteImageInput.click();
+                // Try camera input first, then upload input
+                if (landingWasteImageInputCamera) {
+                    landingWasteImageInputCamera.click();
+                } else if (landingWasteImageInputUpload) {
+                    landingWasteImageInputUpload.click();
+                }
             });
         }
     }
