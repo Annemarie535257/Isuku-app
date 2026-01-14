@@ -194,7 +194,3 @@ To add new features:
 3. Create views in `registration/views.py`
 4. Add URL patterns in `registration/urls.py`
 5. Create templates in `templates/registration/`
-
-## License
-
-This project is for educational purposes.

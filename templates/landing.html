@@ -845,31 +845,46 @@
 </section>
 
 <!-- Waste Categories Section -->
+<section id="waste-categories" class="bg-white py-20">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4" data-translate="Waste Categories We Handle">Waste Categories We Handle</h2>
+            <div class="w-20 h-1 bg-green-primary mx-auto mb-6"></div>
+            <p class="text-gray-600 text-lg max-w-2xl mx-auto" data-translate="We accept and properly manage various types of waste materials">
+                We accept and properly manage various types of waste materials
+            </p>
+        </div>
         {% if waste_categories %}
-        <div class="mt-16">
-            <div class="text-center mb-12">
-                <h3 class="text-3xl font-bold text-gray-900 mb-4" data-translate="Waste Categories We Handle">Waste Categories We Handle</h3>
-                <p class="text-gray-600 max-w-2xl mx-auto" data-translate="We accept and properly manage various types of waste materials">We accept and properly manage various types of waste materials</p>
-            </div>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-                {% for category in waste_categories %}
-                <div class="bg-white rounded-lg p-4 border border-gray-100 hover:shadow-md transition-all duration-300" style="border-left: 4px solid {{ category.color_code }};">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div style="width: 60px; height: 60px; background: {{ category.color_code }}20; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; position: relative;">
-                            {% if category.image %}
-                            <img src="{{ category.image.url }}" alt="{{ category.name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <i class="fas {{ category.icon|default(category|get_category_icon) }}" style="color: {{ category.color_code }}; font-size: 28px; display: none;"></i>
-                            {% else %}
-                            <i class="fas {{ category.icon|default(category|get_category_icon) }}" style="color: {{ category.color_code }}; font-size: 28px;"></i>
-                            {% endif %}
-                        </div>
-                        <h4 class="font-bold text-gray-900" style="color: {{ category.color_code }};">{{ category.name }}</h4>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {% for category in waste_categories %}
+            <div class="bg-white rounded-lg p-6 border-2 border-gray-100 hover:border-green-primary hover:shadow-lg transition-all duration-300" style="border-left: 4px solid {{ category.color_code }};">
+                <div class="flex items-center gap-4 mb-3">
+                    <div style="width: 60px; height: 60px; background: {{ category.color_code }}20; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; position: relative;">
+                        {% if category.image %}
+                        <img src="{{ category.image.url }}" alt="{{ category.name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <i class="fas {{ category.icon|default(category|get_category_icon) }}" style="color: {{ category.color_code }}; font-size: 28px; display: none;"></i>
+                        {% else %}
+                        <i class="fas {{ category.icon|default(category|get_category_icon) }}" style="color: {{ category.color_code }}; font-size: 28px;"></i>
+                        {% endif %}
                     </div>
-                    {% if category.description %}
-                    <p class="text-gray-600 text-sm">{{ category.description }}</p>
-                    {% endif %}
+                    <h4 class="font-bold text-xl text-gray-900" style="color: {{ category.color_code }};">{{ category.name }}</h4>
                 </div>
-                {% endfor %}
+                {% if category.description %}
+                <p class="text-gray-600 text-sm leading-relaxed">{{ category.description }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <div class="max-w-2xl mx-auto">
+                <i class="fas fa-recycle text-gray-300 text-6xl mb-4"></i>
+                <p class="text-gray-500 text-lg mb-2" data-translate="Waste categories are being loaded.">
+                    Waste categories are being loaded.
+                </p>
+                <p class="text-gray-400 text-sm" data-translate="Please check back soon or contact support if this persists.">
+                    Please check back soon or contact support if this persists.
+                </p>
             </div>
         </div>
         {% endif %}
@@ -1097,16 +1112,16 @@
         console.log('Toggling language menu, currently hidden:', isHidden);
         
         if (isHidden) {
-            // Show menu
+            // Show menu - use important flags to override any CSS
             menu.classList.remove('hidden');
-            menu.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important; position: absolute !important; z-index: 9999 !important; top: 100% !important; right: 0 !important; margin-top: 0.5rem !important;';
-            console.log('Menu shown - display:', menu.style.display, 'visibility:', menu.style.visibility);
-            console.log('Menu computed style:', window.getComputedStyle(menu).display);
+            menu.removeAttribute('style');
+            menu.setAttribute('style', 'display: block !important; visibility: visible !important; opacity: 1 !important; position: absolute !important; z-index: 9999 !important; top: 100% !important; right: 0 !important; margin-top: 0.5rem !important; background: white !important;');
+            console.log('Menu shown - display:', window.getComputedStyle(menu).display);
             console.log('Menu children count:', menu.children.length);
             // Force visibility on all children (language options)
             Array.from(menu.children).forEach((child, index) => {
-                child.style.cssText = 'display: flex !important; visibility: visible !important; opacity: 1 !important;';
-                console.log(`Child ${index} (${child.textContent.trim()}) - display:`, window.getComputedStyle(child).display);
+                child.setAttribute('style', 'display: flex !important; visibility: visible !important; opacity: 1 !important;');
+                console.log(`Child ${index} visible`);
             });
         } else {
             // Hide menu
@@ -1254,31 +1269,56 @@
         observer.observe(card);
     });
     
+    // Request location permission on page load
+    function requestLocationPermission() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    console.log('Location permission granted');
+                    // Location will be used when map initializes
+                },
+                function(error) {
+                    console.log('Location permission denied or error:', error.message);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                }
+            );
+        }
+    }
+    
+    // Request location as soon as page loads
+    if (navigator.geolocation) {
+        requestLocationPermission();
+    }
+    
     // Initialize landing page map - wait for DOM and Leaflet to be ready
     function initializeLandingMap() {
         const mapElement = document.getElementById('landingMap');
         if (!mapElement) {
-            console.warn('Landing map element not found');
+            console.warn('Landing map element not found, retrying...');
+            setTimeout(initializeLandingMap, 500);
             return;
         }
         
         // Check if Leaflet is loaded
         if (typeof L === 'undefined') {
-            console.error('Leaflet is not loaded. Make sure Leaflet JS is included before this script.');
-            // Retry after a short delay
+            console.log('Waiting for Leaflet to load...');
             setTimeout(initializeLandingMap, 500);
             return;
         }
         
         // Check if map utilities are loaded
         if (typeof initMap === 'undefined') {
-            console.error('initMap function is not defined. Make sure map_utils.js is loaded.');
-            // Retry after a short delay
+            console.log('Waiting for map utilities to load...');
             setTimeout(initializeLandingMap, 500);
             return;
         }
         
         try {
+            console.log('Initializing map...');
             const landingMap = initMap('landingMap', { zoom: 12 });
             
             // Add default marker for Kigali
@@ -1286,8 +1326,34 @@
                 addMarker(landingMap, -1.9441, 30.0619, 'Isuku Service Area - Kigali, Rwanda', '#059669');
             }
             
-            // Try to get user location and show nearby collectors
-            if (typeof getCurrentLocation !== 'undefined') {
+            // Get user location and show on map
+            if (navigator.geolocation && typeof getCurrentLocation !== 'undefined') {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        console.log('User location:', lat, lon);
+                        
+                        // Center map on user location
+                        landingMap.setView([lat, lon], 13);
+                        
+                        // Add user location marker
+                        if (typeof addMarker !== 'undefined') {
+                            addMarker(landingMap, lat, lon, 'Your Location', '#2563eb');
+                        }
+                    },
+                    function(error) {
+                        console.log('Could not get user location:', error.message);
+                        // Map will show default Kigali location
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 60000
+                    }
+                );
+            } else if (typeof getCurrentLocation !== 'undefined') {
+                // Fallback to getCurrentLocation function
                 getCurrentLocation(function(location) {
                     if (location.success && landingMap) {
                         landingMap.setView([location.lat, location.lon], 13);
@@ -1297,17 +1363,23 @@
                     }
                 });
             }
+            
+            console.log('Map initialized successfully');
         } catch (error) {
             console.error('Error initializing landing map:', error);
+            // Retry after delay
+            setTimeout(initializeLandingMap, 1000);
         }
     }
     
     // Initialize map when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeLandingMap);
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initializeLandingMap, 500);
+        });
     } else {
-        // DOM is already ready, but wait a bit for scripts to load
-        setTimeout(initializeLandingMap, 100);
+        // DOM is already ready, wait for scripts to load
+        setTimeout(initializeLandingMap, 500);
     }
     
     // Landing Page Waste Classifier
