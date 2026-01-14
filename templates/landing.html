@@ -857,20 +857,20 @@
         {% if waste_categories %}
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {% for category in waste_categories %}
-            <div class="bg-white rounded-lg p-6 border-2 border-gray-100 hover:border-green-primary hover:shadow-lg transition-all duration-300" style="border-left: 4px solid {{ category.color_code }};">
+            <div class="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-md transition-all duration-300" style="border-left: 4px solid {{ category.color_code }};">
                 <div class="flex items-center gap-4 mb-3">
-                    <div style="width: 60px; height: 60px; background: {{ category.color_code }}20; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; position: relative;">
+                    <div style="width: 60px; height: 60px; background: {{ category.color_code }}20; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                         {% if category.image %}
                         <img src="{{ category.image.url }}" alt="{{ category.name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <i class="fas {{ category.icon|default(category|get_category_icon) }}" style="color: {{ category.color_code }}; font-size: 28px; display: none;"></i>
+                        <i class="fas {{ category.icon|default(category|get_category_icon) }}" style="color: {{ category.color_code }}; font-size: 24px; display: none;"></i>
                         {% else %}
-                        <i class="fas {{ category.icon|default(category|get_category_icon) }}" style="color: {{ category.color_code }}; font-size: 28px;"></i>
+                        <i class="fas {{ category.icon|default(category|get_category_icon) }}" style="color: {{ category.color_code }}; font-size: 24px;"></i>
                         {% endif %}
                     </div>
-                    <h4 class="font-bold text-xl text-gray-900" style="color: {{ category.color_code }};">{{ category.name }}</h4>
+                    <h4 class="font-bold text-lg text-gray-900" style="color: {{ category.color_code }};">{{ category.name }}</h4>
                 </div>
                 {% if category.description %}
-                <p class="text-gray-600 text-sm leading-relaxed">{{ category.description }}</p>
+                <p class="text-gray-600 text-sm">{{ category.description }}</p>
                 {% endif %}
             </div>
             {% endfor %}
