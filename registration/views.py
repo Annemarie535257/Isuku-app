@@ -44,16 +44,17 @@ def landing_page(request):
     provinces = Province.objects.all()
     
     # Handle case where WasteCategory table doesn't exist yet (migrations not run)
+    # Convert to list immediately to trigger query in try-catch, not in template
     try:
-        waste_categories = WasteCategory.objects.all()
+        waste_categories = list(WasteCategory.objects.all())
     except OperationalError as e:
-        # Table doesn't exist yet - return empty queryset
+        # Table doesn't exist yet - return empty list
         logger.warning(f"WasteCategory table not found. Migrations may need to be run. Error: {e}")
-        waste_categories = WasteCategory.objects.none()
+        waste_categories = []
     except Exception as e:
-        # Any other error - log and return empty queryset
+        # Any other error - log and return empty list
         logger.error(f"Error loading waste categories: {e}")
-        waste_categories = WasteCategory.objects.none()
+        waste_categories = []
     
     context = {
         'messages': list(get_messages(request)),
