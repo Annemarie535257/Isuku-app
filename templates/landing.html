@@ -3,6 +3,7 @@
 {% block title %}Isuku - Waste Management System{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <style>
     @keyframes float {
         0%, 100% {
@@ -97,7 +98,7 @@
     }
     
     .hero-gradient {
-        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 50%, #ecfdf5 100%);
+        background: linear-gradient(135deg, #edf4e6 0%, #d8e7c9 50%, #edf4e6 100%);
         position: relative;
         overflow: hidden;
     }
@@ -193,7 +194,7 @@
         top: 0;
         bottom: 0;
         width: 3px;
-        background: linear-gradient(180deg, #059669, #10b981);
+        background: linear-gradient(180deg, #3f6f2a, #5b8f3d);
         transform: scaleY(0);
         transition: transform 0.2s ease-out;
     }
@@ -207,45 +208,9 @@
         box-shadow: 0 10px 40px rgba(5, 150, 105, 0.15);
     }
     
-    #languageMenu.hidden {
-        display: none !important;
-    }
-    
-    /* Override any Tailwind hidden class */
-    #languageMenu.hidden {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-    }
-    
-    /* Ensure menu container is visible when not hidden */
-    #languageMenu:not(.hidden) {
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: absolute !important;
-        z-index: 9999 !important;
-        top: 100% !important;
-        right: 0 !important;
-        margin-top: 0.5rem !important;
-    }
-    
-    /* Ensure menu items are visible */
     #languageMenu a {
-        display: flex !important;
-        align-items: center !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: relative !important;
-        z-index: 1 !important;
-    }
-    
-    /* Ensure menu items are visible when menu is shown */
-    #languageMenu:not(.hidden) a {
-        display: flex !important;
-        align-items: center !important;
-        visibility: visible !important;
-        opacity: 1 !important;
+        display: flex;
+        align-items: center;
     }
     
     #languageMenu a:hover {
@@ -273,18 +238,18 @@
     
     .animated-icon-left {
         font-size: 2rem;
-        color: #059669;
+        color: #3f6f2a;
     }
     
     .animated-icon-right {
         font-size: 2rem;
-        color: #059669;
+        color: #3f6f2a;
     }
     
     .main-title {
         font-size: 2.5rem;
         font-weight: 800;
-        color: #059669;
+        color: #3f6f2a;
         text-transform: uppercase;
         letter-spacing: 2px;
         line-height: 1.3;
@@ -298,7 +263,7 @@
         left: 0;
         width: 100%;
         height: 3px;
-        background: linear-gradient(90deg, transparent, #059669, transparent);
+        background: linear-gradient(90deg, transparent, #3f6f2a, transparent);
     }
     
     .hero-description {
@@ -306,6 +271,66 @@
         color: #374151;
         line-height: 1.6;
         margin-bottom: 24px;
+    }
+
+    .waste-lab-card {
+        background: linear-gradient(150deg, #ffffff 0%, #f0fdf4 100%);
+        border: 1px solid #d8e7c9;
+    }
+
+    .analyzer-shell {
+        box-shadow: 0 18px 45px rgba(5, 150, 105, 0.12);
+        border: 1px solid rgba(16, 185, 129, 0.22);
+    }
+
+    .analyzer-upload-zone {
+        border: 2px dashed #86efac;
+        border-radius: 14px;
+        background: linear-gradient(180deg, #ffffff 0%, #f7fff9 100%);
+        padding: 20px;
+    }
+
+    .analyzer-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .analyzer-action-btn {
+        width: 100%;
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-weight: 700;
+        transition: all 0.2s ease;
+    }
+
+    .analyzer-action-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 768px) {
+        .analyzer-actions {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .route-map-canvas {
+        height: 540px;
+        border-radius: 0;
+        border: 0;
+        overflow: hidden;
+    }
+
+    .full-bleed {
+        width: 100vw;
+        margin-left: calc(50% - 50vw);
+        margin-right: calc(50% - 50vw);
+    }
+
+    @media (max-width: 768px) {
+        .route-map-canvas {
+            height: 380px;
+        }
     }
     
     .cta-buttons {
@@ -315,7 +340,7 @@
     }
     
     .cta-primary {
-        background: #059669;
+        background: #3f6f2a;
         color: white;
         padding: 14px 32px;
         border-radius: 8px;
@@ -348,7 +373,7 @@
     }
     
     .cta-primary:hover {
-        background: #047857;
+        background: #2f5420;
         transform: translateY(-2px);
         box-shadow: 0 6px 16px rgba(5, 150, 105, 0.4);
     }
@@ -360,20 +385,20 @@
     
     .cta-secondary {
         background: white;
-        color: #059669;
+        color: #3f6f2a;
         padding: 14px 32px;
         border-radius: 8px;
         font-weight: 600;
         font-size: 0.9rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        border: 2px solid #059669;
+        border: 2px solid #3f6f2a;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
     }
     
     .cta-secondary:hover {
-        background: #059669;
+        background: #3f6f2a;
         color: white;
         transform: translateY(-2px);
         box-shadow: 0 6px 16px rgba(5, 150, 105, 0.3);
@@ -394,7 +419,7 @@
     .stat-number {
         font-size: 2rem;
         font-weight: 800;
-        color: #059669;
+        color: #3f6f2a;
         display: block;
         margin-bottom: 6px;
     }
@@ -424,7 +449,7 @@
     
     .floating-badge {
         position: absolute;
-        background: #059669;
+        background: #3f6f2a;
         color: white;
         padding: 8px 16px;
         border-radius: 20px;
@@ -498,6 +523,8 @@
                 <a href="#home" class="text-gray-700 hover:text-green-primary font-medium transition" data-translate="HOME">HOME</a>
                 <a href="#about" class="text-gray-700 hover:text-green-primary font-medium transition" data-translate="ABOUT US">ABOUT US</a>
                 <a href="#services" class="text-gray-700 hover:text-green-primary font-medium transition" data-translate="SERVICES">SERVICES</a>
+                <a href="#image-analyzer" class="text-gray-700 hover:text-green-primary font-medium transition" data-translate="AI SORTING">AI SORTING</a>
+                <a href="#routing-map" class="text-gray-700 hover:text-green-primary font-medium transition" data-translate="ROUTING MAP">ROUTING MAP</a>
                 <a href="#contact" class="text-gray-700 hover:text-green-primary font-medium transition" data-translate="CONTACT US">CONTACT US</a>
                 <div class="relative language-dropdown">
                     <button class="language-button text-gray-700 hover:text-green-primary font-medium transition-all duration-300 flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-green-50 border border-transparent hover:border-green-100" onclick="toggleLanguageDropdown(event)">
@@ -505,7 +532,7 @@
                         <span data-translate="LANGUAGE" class="language-text">LANGUAGE</span>
                         <i class="fas fa-chevron-down text-xs transition-transform duration-300 language-chevron"></i>
                     </button>
-                    <div id="languageMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border-2 border-green-100 py-2 z-[9999] language-menu">
+                    <div id="languageMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border-2 border-green-100 py-2 z-50 overflow-hidden language-menu">
                         <a href="#" class="language-option block px-5 py-3 text-gray-700 hover:bg-green-50 hover:text-green-primary transition-all duration-200 flex items-center space-x-3 group" onclick="changeLanguage('en'); return false;">
                             <span class="text-2xl transform group-hover:scale-110 transition-transform duration-200">🇬🇧</span>
                             <span class="font-medium flex-1">English</span>
@@ -743,167 +770,136 @@
                 </a>
             </div>
         </div>
-    </div>
-</section>
-
-<!-- AI Waste Classifier Section -->
-<section id="waste-classifier" class="bg-white py-20">
-    <div class="container mx-auto px-4">
-        <div class="text-center mb-12">
-            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4" data-translate="AI-Powered Waste Classifier">AI-Powered Waste Classifier</h2>
-            <div class="w-20 h-1 bg-green-primary mx-auto mb-6"></div>
-            <p class="text-gray-600 text-lg max-w-2xl mx-auto" data-translate="Take a photo of your waste and let our AI help you sort it correctly">
-                Take a photo of your waste and let our AI help you sort it correctly
-            </p>
-        </div>
         
-        <div class="max-w-2xl mx-auto">
-            <div class="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-8 border border-green-100 shadow-lg">
-                <!-- Classification Buttons -->
-                <div class="text-center mb-6">
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                        <button type="button" id="landingTakePhotoBtn" class="inline-flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold text-lg rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
-                            <i class="fas fa-camera text-2xl"></i>
-                            <span data-translate="Take Photo">Take Photo</span>
-                        </button>
-                        
-                        <div class="text-gray-400 font-semibold" data-translate="or">or</div>
-                        
-                        <button type="button" id="landingUploadPhotoBtn" class="inline-flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold text-lg rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
-                            <i class="fas fa-upload text-2xl"></i>
-                            <span data-translate="Upload Photo">Upload Photo</span>
-                        </button>
-                    </div>
-                    
-                    <!-- Hidden file inputs -->
-                    <input type="file" id="landingWasteImageInputCamera" accept="image/*" capture="environment" style="display: none;">
-                    <input type="file" id="landingWasteImageInputUpload" accept="image/*" style="display: none;">
-                </div>
-                
-                <!-- Image Preview and Results -->
-                <div id="landingWasteImagePreview" style="display: none;">
-                    <!-- Preview Image -->
-                    <div class="text-center mb-6">
-                        <img id="landingPreviewImage" src="" alt="Preview" class="max-w-full max-h-64 mx-auto rounded-xl border-4 border-green-200 shadow-md">
-                    </div>
-                    
-                    <!-- Classification Result -->
-                    <div id="landingClassificationResult" style="display: none;" class="bg-white rounded-xl p-6 border-2 border-green-200 shadow-md">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                                <i class="fas fa-check-circle text-green-600 text-2xl"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm text-gray-600 mb-1" data-translate="Classified as">Classified as:</p>
-                                <h3 id="landingClassifiedCategory" class="text-2xl font-bold text-green-700"></h3>
-                                <p id="landingClassificationConfidence" class="text-sm text-gray-500 mt-1"></p>
-                            </div>
-                        </div>
-                        
-                        <!-- All Predictions -->
-                        <div id="landingAllPredictions" class="mt-4 p-4 bg-gray-50 rounded-lg text-sm text-gray-600"></div>
-                        
-                        <!-- Action Buttons -->
-                        <div class="mt-6 flex gap-3">
-                            <button type="button" id="landingRetakePhotoBtn" class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors">
-                                <i class="fas fa-redo mr-2"></i>
-                                <span data-translate="Try Another">Try Another</span>
-                            </button>
-                            <a href="{{ url('registration:registration_selection') }}" id="landingGetStartedBtn" class="flex-1 px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-lg hover:from-green-700 hover:to-green-800 transition-all text-center">
-                                <i class="fas fa-arrow-right mr-2"></i>
-                                <span data-translate="Get Started">Get Started</span>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <!-- Error Message -->
-                    <div id="landingClassificationError" style="display: none;" class="bg-red-50 border-2 border-red-200 rounded-xl p-6 text-center">
-                        <i class="fas fa-exclamation-circle text-red-600 text-3xl mb-3"></i>
-                        <p id="landingErrorMessage" class="text-red-700 font-semibold"></p>
-                        <button type="button" id="landingErrorRetryBtn" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                            <i class="fas fa-redo mr-2"></i>
-                            <span data-translate="Try Again">Try Again</span>
-                        </button>
-                    </div>
-                    
-                    <!-- Loading State -->
-                    <div id="landingClassificationLoading" style="display: none;" class="text-center py-8">
-                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent mb-4"></div>
-                        <p class="text-gray-600 font-semibold" data-translate="Analyzing your waste...">Analyzing your waste...</p>
-                    </div>
-                </div>
-                
-                <!-- Info Text -->
-                <div class="mt-6 text-center">
-                    <p class="text-sm text-gray-500" data-translate="Simply take a photo of your waste item and our AI will identify the correct waste category for proper sorting and recycling">
-                        Simply take a photo of your waste item and our AI will identify the correct waste category for proper sorting and recycling
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Waste Categories Section -->
-<section id="waste-categories" class="bg-white py-20">
-    <div class="container mx-auto px-4">
-        <div class="text-center mb-12">
-            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4" data-translate="Waste Categories We Handle">Waste Categories We Handle</h2>
-            <div class="w-20 h-1 bg-green-primary mx-auto mb-6"></div>
-            <p class="text-gray-600 text-lg max-w-2xl mx-auto" data-translate="We accept and properly manage various types of waste materials">
-                We accept and properly manage various types of waste materials
-            </p>
-        </div>
+        <!-- Waste Categories Section -->
         {% if waste_categories %}
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {% for category in waste_categories %}
-            <div class="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-md transition-all duration-300" style="border-left: 4px solid {{ category.color_code }};">
-                <div class="flex items-center gap-4 mb-3">
-                    <div style="width: 60px; height: 60px; background: {{ category.color_code }}20; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        {% if category.image %}
-                        <img src="{{ category.image.url }}" alt="{{ category.name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <i class="fas {{ category.icon|default(category|get_category_icon) }}" style="color: {{ category.color_code }}; font-size: 24px; display: none;"></i>
-                        {% else %}
-                        <i class="fas {{ category.icon|default(category|get_category_icon) }}" style="color: {{ category.color_code }}; font-size: 24px;"></i>
-                        {% endif %}
-                    </div>
-                    <h4 class="font-bold text-lg text-gray-900" style="color: {{ category.color_code }};">{{ category.name }}</h4>
-                </div>
-                {% if category.description %}
-                <p class="text-gray-600 text-sm">{{ category.description }}</p>
-                {% endif %}
+        <div class="mt-16">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-gray-900 mb-4" data-translate="Waste Categories We Handle">Waste Categories We Handle</h3>
+                <p class="text-gray-600 max-w-2xl mx-auto" data-translate="We accept and properly manage various types of waste materials">We accept and properly manage various types of waste materials</p>
             </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="text-center py-12">
-            <div class="max-w-2xl mx-auto">
-                <i class="fas fa-recycle text-gray-300 text-6xl mb-4"></i>
-                <p class="text-gray-500 text-lg mb-2" data-translate="Waste categories are being loaded.">
-                    Waste categories are being loaded.
-                </p>
-                <p class="text-gray-400 text-sm" data-translate="Please check back soon or contact support if this persists.">
-                    Please check back soon or contact support if this persists.
-                </p>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+                {% for category in waste_categories %}
+                <div class="bg-white rounded-lg p-4 border border-gray-100 hover:shadow-md transition-all duration-300" style="border-left: 4px solid {{ category.color_code }};">
+                    {% set lower_name = category.name|lower %}
+                    <div class="mb-3">
+                        {% if 'organic' in lower_name %}
+                        <img src="{{ static('images/ENVIRONMENT 1.png') }}" alt="Organic waste" class="w-full h-28 object-cover rounded-lg" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        {% elif 'plastic' in lower_name %}
+                        <img src="{{ static('images/recycle 1.png') }}" alt="Plastic waste" class="w-full h-28 object-cover rounded-lg" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        {% elif 'paper' in lower_name %}
+                        <img src="{{ static('images/SORT 1.png') }}" alt="Paper waste" class="w-full h-28 object-cover rounded-lg" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        {% elif 'glass' in lower_name %}
+                        <img src="{{ static('images/SMART 1.png') }}" alt="Glass waste" class="w-full h-28 object-cover rounded-lg" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        {% elif 'metal' in lower_name %}
+                        <img src="{{ static('images/COLLECORS 1.png') }}" alt="Metal waste" class="w-full h-28 object-cover rounded-lg" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        {% else %}
+                        <img src="{{ static('images/CLEANC 1.png') }}" alt="General waste" class="w-full h-28 object-cover rounded-lg" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        {% endif %}
+                        <div style="display:none; width:100%; height:112px; background: {{ category.color_code }}20; border-radius: 8px; align-items: center; justify-content: center;">
+                            <i class="fas {{ category.icon|default('fa-trash-alt') }}" style="color: {{ category.color_code }}; font-size: 24px;"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <h4 class="font-bold text-gray-900" style="color: {{ category.color_code }};">{{ category.name }}</h4>
+                    </div>
+                    {% if category.description %}
+                    <p class="text-gray-600 text-sm">{{ category.description }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
             </div>
         </div>
         {% endif %}
     </div>
 </section>
 
-<!-- Service Area Map Section -->
-<section id="map" class="bg-gray-50 py-20">
+<!-- Image Analyzer Section -->
+<section id="image-analyzer" class="bg-white py-20">
     <div class="container mx-auto px-4">
-        <div class="text-center mb-12">
-            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4" data-translate="Our Service Area">Our Service Area</h2>
+        <div class="text-center mb-14">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4" data-translate="AI Waste Image Analyzer">AI Waste Image Analyzer</h2>
             <div class="w-20 h-1 bg-green-primary mx-auto mb-6"></div>
-            <p class="text-gray-600 text-lg max-w-2xl mx-auto" data-translate="View our coverage area and find collectors near you">
-                View our coverage area and find collectors near you
+            <p class="text-gray-600 text-lg max-w-3xl mx-auto" data-translate="Upload a waste photo to get a suggested category and disposal tip.">
+                Upload a waste photo to get a suggested category and disposal tip.
             </p>
         </div>
-        <div class="max-w-6xl mx-auto">
-            <div id="landingMap" style="height: 500px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);"></div>
+
+        <div class="w-full">
+            <div class="waste-lab-card analyzer-shell rounded-2xl p-7">
+                <form id="wasteImageForm" class="space-y-4">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    <div class="analyzer-upload-zone">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i class="fas fa-image text-green-primary"></i>
+                            <p class="text-sm font-semibold text-gray-700" data-translate="Choose a photo from gallery or use camera">Choose a photo from gallery or use camera</p>
+                        </div>
+                        <p id="selectedImageName" class="text-xs text-gray-500" data-translate="No image selected yet">No image selected yet</p>
+                        <input id="wasteImageInput" name="waste_image" type="file" accept="image/*" class="hidden">
+                        <input id="wasteImageCameraInput" type="file" accept="image/*" capture="environment" class="hidden">
+                        <div class="analyzer-actions mt-4">
+                            <button id="chooseImageBtn" type="button" class="analyzer-action-btn bg-white text-green-primary border border-green-primary hover:bg-green-50" data-translate="Upload From Device">
+                                <i class="fas fa-upload mr-2"></i>Upload From Device
+                            </button>
+                            <button id="takePhotoBtn" type="button" class="analyzer-action-btn bg-green-primary text-white hover:bg-green-700" data-translate="Take Photo Now">
+                                <i class="fas fa-camera mr-2"></i>Take Photo Now
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-green-primary text-white px-5 py-3 rounded-lg font-semibold hover:bg-green-700 transition" data-translate="Analyze Waste Image">
+                        Analyze Waste Image
+                    </button>
+                </form>
+
+                <div id="wasteImagePreviewContainer" class="mt-5 hidden">
+                    <img id="wasteImagePreview" alt="Waste preview" class="w-full h-52 object-cover rounded-xl border border-gray-200">
+                </div>
+
+                <div id="wasteAnalysisResult" class="mt-5 hidden bg-white rounded-xl border border-green-100 p-4">
+                    <p class="text-sm text-gray-500 mb-2" data-translate="Suggested category">Suggested category</p>
+                    <p id="analysisCategory" class="text-2xl font-bold text-green-primary"></p>
+                    <p id="analysisConfidence" class="text-sm text-gray-600 mt-1"></p>
+                    <p id="analysisTip" class="text-gray-700 mt-3"></p>
+                </div>
+            </div>
         </div>
+    </div>
+</section>
+
+<!-- Routing Section -->
+<section id="routing-map" class="bg-green-50 py-20">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-14">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4" data-translate="Pickup Routing by Residence">Pickup Routing by Residence</h2>
+            <div class="w-20 h-1 bg-green-primary mx-auto mb-6"></div>
+            <p class="text-gray-600 text-lg max-w-3xl mx-auto" data-translate="Allow location access to automatically generate your pickup route from your current address.">
+                Allow location access to automatically generate your pickup route from your current address.
+            </p>
+        </div>
+
+        <div class="waste-lab-card rounded-2xl p-5 md:p-7 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <p id="routeStatus" class="text-sm text-gray-700" data-translate="Detecting your location to build pickup route...">
+                    Detecting your location to build pickup route...
+                </p>
+                <button id="retryLocationBtn" type="button" class="bg-green-primary text-white px-5 py-2 rounded-lg font-semibold hover:bg-green-700 transition" data-translate="Use My Location">
+                    Use My Location
+                </button>
+            </div>
+            <p id="detectedAddress" class="text-sm text-gray-600 mt-3" data-translate="Address will appear here once location is allowed.">
+                Address will appear here once location is allowed.
+            </p>
+        </div>
+    </div>
+
+    <div class="full-bleed">
+        <div id="routeMap" class="route-map-canvas"></div>
+    </div>
+
+    <div class="container mx-auto px-4 mt-4">
+        <p id="routeSummary" class="text-sm text-gray-700" data-translate="Waiting for location permission to display your pickup route.">
+            Waiting for location permission to display your pickup route.
+        </p>
     </div>
 </section>
 
@@ -1095,110 +1091,8 @@
 </footer>
 
 <!-- Smooth Scroll and Interactive Scripts -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
-    // Make functions globally accessible
-    window.toggleLanguageDropdown = function(event) {
-        if (event) {
-            event.stopPropagation();
-        }
-        const menu = document.getElementById('languageMenu');
-        if (!menu) {
-            console.error('Language menu not found');
-            return;
-        }
-        
-        // Toggle visibility - force display changes
-        const isHidden = menu.classList.contains('hidden');
-        console.log('Toggling language menu, currently hidden:', isHidden);
-        
-        if (isHidden) {
-            // Show menu - use important flags to override any CSS
-            menu.classList.remove('hidden');
-            menu.removeAttribute('style');
-            menu.setAttribute('style', 'display: block !important; visibility: visible !important; opacity: 1 !important; position: absolute !important; z-index: 9999 !important; top: 100% !important; right: 0 !important; margin-top: 0.5rem !important; background: white !important;');
-            console.log('Menu shown - display:', window.getComputedStyle(menu).display);
-            console.log('Menu children count:', menu.children.length);
-            // Force visibility on all children (language options)
-            Array.from(menu.children).forEach((child, index) => {
-                child.setAttribute('style', 'display: flex !important; visibility: visible !important; opacity: 1 !important;');
-                console.log(`Child ${index} visible`);
-            });
-        } else {
-            // Hide menu
-            menu.classList.add('hidden');
-            menu.style.display = 'none';
-            menu.style.visibility = 'hidden';
-            menu.style.opacity = '0';
-            console.log('Menu hidden');
-        }
-        
-        // Rotate chevron
-        const chevron = document.querySelector('.language-chevron');
-        if (chevron) {
-            if (isHidden) {
-                chevron.style.transform = 'rotate(180deg)';
-            } else {
-                chevron.style.transform = 'rotate(0deg)';
-            }
-        }
-    };
-    
-    window.changeLanguage = function(lang) {
-        console.log('🌐 changeLanguage called with:', lang);
-        
-        // Close dropdown
-        const menu = document.getElementById('languageMenu');
-        if (menu) {
-            menu.classList.add('hidden');
-            menu.style.display = 'none';
-        }
-        
-        // Reset chevron
-        const chevron = document.querySelector('.language-chevron');
-        if (chevron) {
-            chevron.style.transform = 'rotate(0deg)';
-        }
-        
-        // Ensure TranslationManager exists; if not, wait for it or load it dynamically
-        if (!window.TranslationManager) {
-            console.warn('TranslationManager not found; waiting for it to load...');
-            // Wait for TranslationManager to be available (with timeout)
-            let attempts = 0;
-            const maxAttempts = 50; // Wait up to 5 seconds (50 * 100ms)
-            const checkInterval = setInterval(() => {
-                attempts++;
-                if (window.TranslationManager && typeof window.TranslationManager.setLanguage === 'function') {
-                    clearInterval(checkInterval);
-                    console.log('✅ TranslationManager found, setting language to:', lang);
-                    const success = window.TranslationManager.setLanguage(lang);
-                    if (success) {
-                        setTimeout(() => {
-                            if (window.TranslationManager && typeof window.TranslationManager.applyTranslations === 'function') {
-                                window.TranslationManager.applyTranslations();
-                            }
-                        }, 200);
-                    }
-                } else if (attempts >= maxAttempts) {
-                    clearInterval(checkInterval);
-                    console.error('❌ TranslationManager failed to load after', maxAttempts, 'attempts');
-                    alert('Language feature is loading. Please refresh the page and try again.');
-                }
-            }, 100);
-        } else {
-            console.log('TranslationManager available, setting language to:', lang);
-            const success = window.TranslationManager.setLanguage(lang);
-            if (success) {
-                setTimeout(() => {
-                    if (window.TranslationManager && typeof window.TranslationManager.applyTranslations === 'function') {
-                        window.TranslationManager.applyTranslations();
-                    }
-                }, 200);
-            } else {
-                console.error('Failed to set language:', lang);
-            }
-        }
-    };
-    
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
@@ -1216,13 +1110,29 @@
         });
     });
 
+    // Language dropdown toggle
+    function toggleLanguageDropdown(event) {
+        if (event) {
+            event.stopPropagation();
+        }
+        const menu = document.getElementById('languageMenu');
+        menu.classList.toggle('hidden');
+        
+        // Rotate chevron
+        const chevron = document.querySelector('.language-chevron');
+        if (menu.classList.contains('hidden')) {
+            chevron.style.transform = 'rotate(0deg)';
+        } else {
+            chevron.style.transform = 'rotate(180deg)';
+        }
+    }
+    
     // Close language dropdown when clicking outside
     document.addEventListener('click', function(event) {
         const dropdown = document.querySelector('.language-dropdown');
         const menu = document.getElementById('languageMenu');
-        if (dropdown && menu && !dropdown.contains(event.target)) {
+        if (dropdown && !dropdown.contains(event.target)) {
             menu.classList.add('hidden');
-            menu.style.display = 'none';
             const chevron = document.querySelector('.language-chevron');
             if (chevron) {
                 chevron.style.transform = 'rotate(0deg)';
@@ -1246,6 +1156,75 @@
         return cookieValue;
     }
     
+    // Change language function - uses JavaScript translation
+    function changeLanguage(lang) {
+        console.log('🌐 changeLanguage called with:', lang);
+        
+        // Close dropdown
+        const menu = document.getElementById('languageMenu');
+        if (menu) {
+            menu.classList.add('hidden');
+        }
+        
+        // Reset chevron
+        const chevron = document.querySelector('.language-chevron');
+        if (chevron) {
+            chevron.style.transform = 'rotate(0deg)';
+        }
+        
+        // Ensure TranslationManager exists; if not, wait for it or load it dynamically
+        if (!window.TranslationManager) {
+            console.warn('TranslationManager not found; waiting for it to load...');
+            // Wait for TranslationManager to be available (with timeout)
+            let attempts = 0;
+            const maxAttempts = 20; // Wait up to 2 seconds (20 * 100ms)
+            const checkInterval = setInterval(() => {
+                attempts++;
+                if (window.TranslationManager) {
+                    clearInterval(checkInterval);
+                    const success = window.TranslationManager.setLanguage(lang);
+                    if (success) {
+                        setTimeout(() => window.TranslationManager.applyTranslations(), 200);
+                    }
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(checkInterval);
+                    console.error('TranslationManager failed to load');
+                    // Try loading script dynamically as fallback
+                    const scriptUrl = "{{ static('js/translations.js') }}";
+                    const s = document.createElement('script');
+                    s.src = scriptUrl;
+                    s.onload = function () {
+                        if (window.TranslationManager) {
+                            window.TranslationManager.setLanguage(lang);
+                            setTimeout(() => window.TranslationManager.applyTranslations(), 200);
+                        }
+                    };
+                    s.onerror = function () {
+                        console.error('Failed to load translations.js from:', scriptUrl);
+                    };
+                    document.head.appendChild(s);
+                }
+            }, 100);
+            return;
+        }
+        
+        // Change language when TranslationManager is available
+        try {
+            const success = window.TranslationManager.setLanguage(lang);
+            if (success) {
+                setTimeout(() => {
+                    if (window.TranslationManager) {
+                        window.TranslationManager.applyTranslations();
+                    }
+                }, 200);
+            } else {
+                console.error('Failed to set language:', lang);
+            }
+        } catch (error) {
+            console.error('Error changing language:', error);
+        }
+    }
+
     // Intersection Observer for animations
     const observerOptions = {
         threshold: 0.1,
@@ -1268,676 +1247,275 @@
         card.style.transition = 'all 0.6s ease-out';
         observer.observe(card);
     });
-    
-    // Request location permission on page load
-    function requestLocationPermission() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    console.log('Location permission granted');
-                    // Location will be used when map initializes
-                },
-                function(error) {
-                    console.log('Location permission denied or error:', error.message);
-                },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 5000,
-                    maximumAge: 0
-                }
-            );
-        }
-    }
-    
-    // Request location as soon as page loads
-    if (navigator.geolocation) {
-        requestLocationPermission();
-    }
-    
-    // Initialize landing page map - wait for DOM and Leaflet to be ready
-    function initializeLandingMap() {
-        const mapElement = document.getElementById('landingMap');
-        if (!mapElement) {
-            console.warn('Landing map element not found, retrying...');
-            setTimeout(initializeLandingMap, 500);
-            return;
-        }
-        
-        // Check if Leaflet is loaded
-        if (typeof L === 'undefined') {
-            console.log('Waiting for Leaflet to load...');
-            setTimeout(initializeLandingMap, 500);
-            return;
-        }
-        
-        // Check if map utilities are loaded
-        if (typeof initMap === 'undefined') {
-            console.log('Waiting for map utilities to load...');
-            setTimeout(initializeLandingMap, 500);
-            return;
-        }
-        
-        try {
-            console.log('Initializing map...');
-            const landingMap = initMap('landingMap', { zoom: 12 });
-            
-            // Add default marker for Kigali
-            if (typeof addMarker !== 'undefined') {
-                addMarker(landingMap, -1.9441, 30.0619, 'Isuku Service Area - Kigali, Rwanda', '#059669');
+
+    // Waste image analyzer
+    const wasteImageForm = document.getElementById('wasteImageForm');
+    const wasteImageInput = document.getElementById('wasteImageInput');
+    const chooseImageBtn = document.getElementById('chooseImageBtn');
+    const wasteImageCameraInput = document.getElementById('wasteImageCameraInput');
+    const takePhotoBtn = document.getElementById('takePhotoBtn');
+    const selectedImageName = document.getElementById('selectedImageName');
+    const wasteImagePreview = document.getElementById('wasteImagePreview');
+    const wasteImagePreviewContainer = document.getElementById('wasteImagePreviewContainer');
+    const wasteAnalysisResult = document.getElementById('wasteAnalysisResult');
+    const analysisCategory = document.getElementById('analysisCategory');
+    const analysisConfidence = document.getElementById('analysisConfidence');
+    const analysisTip = document.getElementById('analysisTip');
+    let selectedWasteImageFile = null;
+
+    function previewSelectedWasteImage(file) {
+        if (!file) {
+            wasteImagePreviewContainer.classList.add('hidden');
+            selectedWasteImageFile = null;
+            if (selectedImageName) {
+                selectedImageName.textContent = 'No image selected yet';
             }
-            
-            // Get user location and show on map
-            if (navigator.geolocation && typeof getCurrentLocation !== 'undefined') {
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        console.log('User location:', lat, lon);
-                        
-                        // Center map on user location
-                        landingMap.setView([lat, lon], 13);
-                        
-                        // Add user location marker
-                        if (typeof addMarker !== 'undefined') {
-                            addMarker(landingMap, lat, lon, 'Your Location', '#2563eb');
-                        }
-                    },
-                    function(error) {
-                        console.log('Could not get user location:', error.message);
-                        // Map will show default Kigali location
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 60000
-                    }
-                );
-            } else if (typeof getCurrentLocation !== 'undefined') {
-                // Fallback to getCurrentLocation function
-                getCurrentLocation(function(location) {
-                    if (location.success && landingMap) {
-                        landingMap.setView([location.lat, location.lon], 13);
-                        if (typeof addMarker !== 'undefined') {
-                            addMarker(landingMap, location.lat, location.lon, 'Your Location', '#2563eb');
-                        }
-                    }
-                });
-            }
-            
-            console.log('Map initialized successfully');
-        } catch (error) {
-            console.error('Error initializing landing map:', error);
-            // Retry after delay
-            setTimeout(initializeLandingMap, 1000);
-        }
-    }
-    
-    // Initialize map when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(initializeLandingMap, 500);
-        });
-    } else {
-        // DOM is already ready, wait for scripts to load
-        setTimeout(initializeLandingMap, 500);
-    }
-    
-    // Landing Page Waste Classifier
-    const landingWasteImagePreview = document.getElementById('landingWasteImagePreview');
-    const landingPreviewImage = document.getElementById('landingPreviewImage');
-    const landingClassificationResult = document.getElementById('landingClassificationResult');
-    const landingClassificationError = document.getElementById('landingClassificationError');
-    const landingErrorMessage = document.getElementById('landingErrorMessage');
-    const landingClassifiedCategory = document.getElementById('landingClassifiedCategory');
-    const landingClassificationConfidence = document.getElementById('landingClassificationConfidence');
-    const landingAllPredictions = document.getElementById('landingAllPredictions');
-    const landingRetakePhotoBtn = document.getElementById('landingRetakePhotoBtn');
-    const landingErrorRetryBtn = document.getElementById('landingErrorRetryBtn');
-    const landingClassificationLoading = document.getElementById('landingClassificationLoading');
-    
-    // Helper function to get CSRF token
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    
-    // Handle Take Photo button
-    if (landingTakePhotoBtn && landingWasteImageInputCamera) {
-        landingTakePhotoBtn.addEventListener('click', function() {
-            landingWasteImageInputCamera.click();
-        });
-    }
-    
-    // Handle Upload Photo button
-    if (landingUploadPhotoBtn && landingWasteImageInputUpload) {
-        landingUploadPhotoBtn.addEventListener('click', function() {
-            landingWasteImageInputUpload.click();
-        });
-    }
-    
-    // Handle file selection for camera
-    if (landingWasteImageInputCamera) {
-        landingWasteImageInputCamera.addEventListener('change', function(e) {
-            handleLandingImageSelection(e.target.files[0]);
-        });
-    }
-    
-    // Handle file selection for upload
-    if (landingWasteImageInputUpload) {
-        landingWasteImageInputUpload.addEventListener('change', function(e) {
-            handleLandingImageSelection(e.target.files[0]);
-        });
-    }
-    
-    function handleLandingImageSelection(file) {
-        if (!file) return;
-            
-        // Validate file type
-        if (!file.type.startsWith('image/')) {
-            showLandingClassificationError('Please select an image file');
             return;
         }
-        
-        // Validate file size (10MB max)
-        if (file.size > 10 * 1024 * 1024) {
-            showLandingClassificationError('Image too large. Maximum size is 10MB');
-            return;
+
+        selectedWasteImageFile = file;
+        if (selectedImageName) {
+            selectedImageName.textContent = file.name;
         }
-        
-        // Show preview
         const reader = new FileReader();
-        reader.onload = function(e) {
-            landingPreviewImage.src = e.target.result;
-            landingWasteImagePreview.style.display = 'block';
-            landingClassificationResult.style.display = 'none';
-            landingClassificationError.style.display = 'none';
-            landingClassificationLoading.style.display = 'block';
-            
-            // Show loading state
-            if (landingTakePhotoBtn) {
-                landingTakePhotoBtn.disabled = true;
-                landingTakePhotoBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-translate="Classifying...">Classifying...</span>';
-            }
-            if (landingUploadPhotoBtn) {
-                landingUploadPhotoBtn.disabled = true;
-                landingUploadPhotoBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-translate="Classifying...">Classifying...</span>';
-            }
-            
-            // Classify the image
-            classifyLandingWasteImage(file);
+        reader.onload = function (event) {
+            wasteImagePreview.src = event.target.result;
+            wasteImagePreviewContainer.classList.remove('hidden');
         };
         reader.readAsDataURL(file);
     }
-        
-        // Retake photo
-        if (landingRetakePhotoBtn) {
-            landingRetakePhotoBtn.addEventListener('click', function() {
-                if (landingWasteImageInputCamera) landingWasteImageInputCamera.value = '';
-                if (landingWasteImageInputUpload) landingWasteImageInputUpload.value = '';
-                landingWasteImagePreview.style.display = 'none';
-                if (landingTakePhotoBtn) {
-                    landingTakePhotoBtn.innerHTML = '<i class="fas fa-camera text-2xl"></i> <span data-translate="Take Photo">Take Photo</span>';
-                    landingTakePhotoBtn.disabled = false;
-                }
-                if (landingUploadPhotoBtn) {
-                    landingUploadPhotoBtn.innerHTML = '<i class="fas fa-upload text-2xl"></i> <span data-translate="Upload Photo">Upload Photo</span>';
-                    landingUploadPhotoBtn.disabled = false;
-                }
-            });
-        }
-        
-        // Error retry
-        if (landingErrorRetryBtn) {
-            landingErrorRetryBtn.addEventListener('click', function() {
-                // Try camera input first, then upload input
-                if (landingWasteImageInputCamera) {
-                    landingWasteImageInputCamera.click();
-                } else if (landingWasteImageInputUpload) {
-                    landingWasteImageInputUpload.click();
-                }
-            });
-        }
-    }
-    
-    function classifyLandingWasteImage(file) {
-        const formData = new FormData();
-        formData.append('image', file);
-        
-        const csrftoken = getCookie('csrftoken');
-        
-        fetch('/api/classify-waste/', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrftoken || ''
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            landingClassificationLoading.style.display = 'none';
-            if (landingTakePhotoBtn) {
-                landingTakePhotoBtn.innerHTML = '<i class="fas fa-camera text-2xl"></i> <span data-translate="Take Photo">Take Photo</span>';
-                landingTakePhotoBtn.disabled = false;
-            }
-            if (landingUploadPhotoBtn) {
-                landingUploadPhotoBtn.innerHTML = '<i class="fas fa-upload text-2xl"></i> <span data-translate="Upload Photo">Upload Photo</span>';
-                landingUploadPhotoBtn.disabled = false;
-            }
-            
-            if (data.success && data.category_name) {
-                // Show success result
-                landingClassificationResult.style.display = 'block';
-                landingClassificationError.style.display = 'none';
-                
-                landingClassifiedCategory.textContent = data.category_name || data.category;
-                landingClassificationConfidence.textContent = `(${(data.confidence * 100).toFixed(0)}% confidence)`;
-                
-                // Show all predictions
-                if (data.all_predictions && data.all_predictions.length > 0) {
-                    const predictionsHtml = data.all_predictions.map(p => 
-                        `<span class="inline-block px-2 py-1 bg-white rounded mr-2 mb-2">${p.category}: ${(p.confidence * 100).toFixed(0)}%</span>`
-                    ).join('');
-                    landingAllPredictions.innerHTML = '<strong>Other possibilities:</strong><br>' + predictionsHtml;
-                }
-            } else {
-                showLandingClassificationError(data.error || 'Could not classify waste. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Classification error:', error);
-            landingClassificationLoading.style.display = 'none';
-            if (landingTakePhotoBtn) {
-                landingTakePhotoBtn.innerHTML = '<i class="fas fa-camera text-2xl"></i> <span data-translate="Take Photo">Take Photo</span>';
-                landingTakePhotoBtn.disabled = false;
-            }
-            if (landingUploadPhotoBtn) {
-                landingUploadPhotoBtn.innerHTML = '<i class="fas fa-upload text-2xl"></i> <span data-translate="Upload Photo">Upload Photo</span>';
-                landingUploadPhotoBtn.disabled = false;
-            }
-            showLandingClassificationError('Error classifying image. Please try again.');
+
+    if (chooseImageBtn && wasteImageInput) {
+        chooseImageBtn.addEventListener('click', function () {
+            wasteImageInput.click();
         });
     }
-    
-    function showLandingClassificationError(message) {
-        landingClassificationError.style.display = 'block';
-        landingClassificationResult.style.display = 'none';
-        landingClassificationLoading.style.display = 'none';
-        landingErrorMessage.textContent = message;
-    }
-</script>
 
-<!-- Chatbot Styles -->
-<style>
-    .chatbot-container {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 1000;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    if (wasteImageInput) {
+        wasteImageInput.addEventListener('change', function () {
+            previewSelectedWasteImage(wasteImageInput.files[0]);
+        });
     }
-    
-    .chatbot-button {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-        border: none;
-        box-shadow: 0 4px 20px rgba(5, 150, 105, 0.4);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 24px;
-        transition: all 0.3s ease;
-        position: relative;
-    }
-    
-    .chatbot-button:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 25px rgba(5, 150, 105, 0.5);
-    }
-    
-    .chatbot-button .badge {
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        background: #ef4444;
-        color: white;
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        font-size: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-    }
-    
-    .chatbot-window {
-        position: absolute;
-        bottom: 80px;
-        right: 0;
-        width: 380px;
-        height: 500px;
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        display: none;
-        flex-direction: column;
-        overflow: hidden;
-    }
-    
-    .chatbot-window.active {
-        display: flex;
-        animation: slideUp 0.3s ease;
-    }
-    
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .chatbot-header {
-        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-        color: white;
-        padding: 16px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .chatbot-header h3 {
-        margin: 0;
-        font-size: 18px;
-        font-weight: 600;
-    }
-    
-    .chatbot-close {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 24px;
-        cursor: pointer;
-        padding: 0;
-        width: 30px;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: background 0.2s;
-    }
-    
-    .chatbot-close:hover {
-        background: rgba(255, 255, 255, 0.2);
-    }
-    
-    .chatbot-messages {
-        flex: 1;
-        overflow-y: auto;
-        padding: 20px;
-        background: #f9fafb;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-    
-    .chatbot-message {
-        max-width: 80%;
-        padding: 12px 16px;
-        border-radius: 12px;
-        word-wrap: break-word;
-        animation: fadeIn 0.3s ease;
-    }
-    
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .chatbot-message.user {
-        background: #059669;
-        color: white;
-        align-self: flex-end;
-        border-bottom-right-radius: 4px;
-    }
-    
-    .chatbot-message.bot {
-        background: white;
-        color: #1f2937;
-        align-self: flex-start;
-        border-bottom-left-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    
-    .chatbot-message.loading {
-        background: #e5e7eb;
-        color: #6b7280;
-        align-self: flex-start;
-    }
-    
-    .chatbot-input-container {
-        padding: 16px;
-        background: white;
-        border-top: 1px solid #e5e7eb;
-        display: flex;
-        gap: 8px;
-    }
-    
-    .chatbot-input {
-        flex: 1;
-        padding: 12px 16px;
-        border: 2px solid #e5e7eb;
-        border-radius: 24px;
-        font-size: 14px;
-        outline: none;
-        transition: border-color 0.2s;
-    }
-    
-    .chatbot-input:focus {
-        border-color: #059669;
-    }
-    
-    .chatbot-send {
-        background: #059669;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 44px;
-        height: 44px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-    }
-    
-    .chatbot-send:hover {
-        background: #047857;
-        transform: scale(1.05);
-    }
-    
-    .chatbot-send:disabled {
-        background: #9ca3af;
-        cursor: not-allowed;
-        transform: none;
-    }
-    
-    @media (max-width: 480px) {
-        .chatbot-window {
-            width: calc(100vw - 40px);
-            right: -10px;
-        }
-        
-        .chatbot-container {
-            bottom: 10px;
-            right: 10px;
-        }
-    }
-</style>
 
-<!-- Chatbot HTML -->
-<div class="chatbot-container">
-    <button class="chatbot-button" id="chatbotToggle" aria-label="Open chatbot">
-        💬
-    </button>
-    <div class="chatbot-window" id="chatbotWindow">
-        <div class="chatbot-header">
-            <h3>Isuku Assistant</h3>
-            <button class="chatbot-close" id="chatbotClose" aria-label="Close chatbot">×</button>
-        </div>
-        <div class="chatbot-messages" id="chatbotMessages">
-            <div class="chatbot-message bot">
-                Hello! I'm Isuku Assistant. How can I help you with waste management today?
-            </div>
-        </div>
-        <div class="chatbot-input-container">
-            <input 
-                type="text" 
-                class="chatbot-input" 
-                id="chatbotInput" 
-                placeholder="Type your question..."
-                autocomplete="off"
-            />
-            <button class="chatbot-send" id="chatbotSend" aria-label="Send message">
-                ➤
-            </button>
-        </div>
-    </div>
-</div>
+    if (takePhotoBtn && wasteImageCameraInput) {
+        takePhotoBtn.addEventListener('click', function () {
+            wasteImageCameraInput.click();
+        });
+        wasteImageCameraInput.addEventListener('change', function () {
+            previewSelectedWasteImage(wasteImageCameraInput.files[0]);
+        });
+    }
 
-<!-- Chatbot JavaScript -->
-<script>
-    (function() {
-        const chatbotToggle = document.getElementById('chatbotToggle');
-        const chatbotWindow = document.getElementById('chatbotWindow');
-        const chatbotClose = document.getElementById('chatbotClose');
-        const chatbotMessages = document.getElementById('chatbotMessages');
-        const chatbotInput = document.getElementById('chatbotInput');
-        const chatbotSend = document.getElementById('chatbotSend');
-        
-        let isOpen = false;
-        
-        // Toggle chatbot window
-        chatbotToggle.addEventListener('click', function() {
-            isOpen = !isOpen;
-            if (isOpen) {
-                chatbotWindow.classList.add('active');
-                chatbotInput.focus();
-            } else {
-                chatbotWindow.classList.remove('active');
+    if (wasteImageForm) {
+        wasteImageForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const file = selectedWasteImageFile;
+            if (!file) {
+                alert('Please select an image before analyzing.');
+                return;
             }
-        });
-        
-        // Close chatbot
-        chatbotClose.addEventListener('click', function() {
-            isOpen = false;
-            chatbotWindow.classList.remove('active');
-        });
-        
-        // Add message to chat
-        function addMessage(text, type) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `chatbot-message ${type}`;
-            messageDiv.textContent = text;
-            chatbotMessages.appendChild(messageDiv);
-            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-            return messageDiv;
-        }
-        
-        // Send message function
-        async function sendMessage() {
-            const question = chatbotInput.value.trim();
-            if (!question) return;
-            
-            // Add user message
-            addMessage(question, 'user');
-            chatbotInput.value = '';
-            chatbotSend.disabled = true;
-            
-            // Add loading message
-            const loadingMsg = addMessage('Thinking...', 'loading');
-            
+
+            const formData = new FormData();
+            formData.append('waste_image', file);
+
             try {
-                // Get CSRF token
-                const csrftoken = getCookie('csrftoken');
-                
-                // Send request to API
-                const response = await fetch('{{ url("registration:chatbot_api") }}', {
+                const response = await fetch("{{ url('registration:analyze_waste_image') }}", {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrftoken
+                        'X-CSRFToken': getCookie('csrftoken') || ''
                     },
-                    body: JSON.stringify({ question: question })
+                    body: formData
                 });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
+
                 const data = await response.json();
-                
-                // Remove loading message
-                loadingMsg.remove();
-                
-                if (data.success) {
-                    addMessage(data.response, 'bot');
-                } else {
-                    const errorMsg = data.error || 'Sorry, I encountered an error. Please try again.';
-                    addMessage(errorMsg, 'bot');
-                    console.error('Chatbot error:', errorMsg);
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Analysis failed.');
                 }
+
+                analysisCategory.textContent = data.category;
+                analysisConfidence.textContent = `Confidence: ${data.confidence}%`;
+                analysisTip.textContent = data.tip;
+                wasteAnalysisResult.classList.remove('hidden');
             } catch (error) {
-                loadingMsg.remove();
-                console.error('Chatbot request error:', error);
-                let errorMessage = 'Sorry, I encountered an error connecting to the chatbot. ';
-                if (error.message && error.message.includes('Failed to fetch')) {
-                    errorMessage += 'Please check your internet connection and try again.';
-                } else if (error.message && error.message.includes('HTTP error')) {
-                    errorMessage += 'The server encountered an error. Please try again later.';
-                } else {
-                    errorMessage += 'Please try again later or contact support.';
-                }
-                addMessage(errorMessage, 'bot');
-            } finally {
-                chatbotSend.disabled = false;
-                chatbotInput.focus();
-            }
-        }
-        
-        // Send on button click
-        chatbotSend.addEventListener('click', sendMessage);
-        
-        // Send on Enter key
-        chatbotInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
+                alert(error.message || 'Unable to analyze image right now.');
             }
         });
-    })();
+    }
+
+    // Address-based route preview
+    const routeStatus = document.getElementById('routeStatus');
+    const detectedAddress = document.getElementById('detectedAddress');
+    const retryLocationBtn = document.getElementById('retryLocationBtn');
+    const routeSummary = document.getElementById('routeSummary');
+    let routeMap = null;
+    let routeLayers = [];
+
+    const routeProfiles = {
+        'Kigali': {
+            transfer: [-1.9536, 30.0908],
+            processing: [-1.9706, 30.1044],
+        },
+        'Northern Province': {
+            transfer: [-1.5620, 29.6770],
+            processing: [-1.6500, 29.8000],
+        },
+        'Southern Province': {
+            transfer: [-2.5300, 29.7600],
+            processing: [-2.4500, 29.7100],
+        },
+        'Eastern Province': {
+            transfer: [-1.7850, 30.5600],
+            processing: [-1.8600, 30.6700],
+        },
+        'Western Province': {
+            transfer: [-2.0800, 29.3600],
+            processing: [-2.1400, 29.4200],
+        },
+    };
+
+    function initializeRouteMap() {
+        if (!document.getElementById('routeMap') || routeMap) {
+            return;
+        }
+
+        routeMap = L.map('routeMap').setView([-1.95, 30.06], 8);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            subdomains: 'abcd',
+            maxZoom: 20,
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+        }).addTo(routeMap);
+    }
+
+    function clearRouteLayers() {
+        routeLayers.forEach(layer => routeMap.removeLayer(layer));
+        routeLayers = [];
+    }
+
+    function normalizeProvince(value) {
+        if (!value) {
+            return '';
+        }
+        const normalized = value.toLowerCase();
+        if (normalized.includes('kigali')) {
+            return 'Kigali';
+        }
+        if (normalized.includes('north')) {
+            return 'Northern Province';
+        }
+        if (normalized.includes('south')) {
+            return 'Southern Province';
+        }
+        if (normalized.includes('east')) {
+            return 'Eastern Province';
+        }
+        if (normalized.includes('west')) {
+            return 'Western Province';
+        }
+        return '';
+    }
+
+    function fallbackRouteFromLocation(userPoint) {
+        return [
+            userPoint,
+            [userPoint[0] + 0.03, userPoint[1] + 0.03],
+            [userPoint[0] + 0.06, userPoint[1] + 0.07]
+        ];
+    }
+
+    function updateRouteMap(points, provinceLabel) {
+        initializeRouteMap();
+        if (!routeMap) {
+            return;
+        }
+
+        clearRouteLayers();
+        const labels = ['Household pickup point', 'Local transfer point', 'Processing point'];
+
+        points.forEach((point, index) => {
+            const marker = L.marker(point).addTo(routeMap).bindPopup(labels[index]);
+            routeLayers.push(marker);
+        });
+
+        const routeLine = L.polyline(points, {
+            color: '#3f6f2a',
+            weight: 5,
+            opacity: 0.85,
+            dashArray: '8,6'
+        }).addTo(routeMap);
+        routeLayers.push(routeLine);
+
+        routeMap.fitBounds(routeLine.getBounds(), { padding: [24, 24] });
+        routeSummary.textContent = `Suggested route for ${provinceLabel}: household pickup -> transfer point -> processing point.`;
+    }
+
+    async function reverseGeocode(lat, lon) {
+        const endpoint = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
+        const response = await fetch(endpoint, {
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Address lookup failed');
+        }
+        return response.json();
+    }
+
+    async function locateAndRenderRoute() {
+        initializeRouteMap();
+
+        if (!navigator.geolocation) {
+            routeStatus.textContent = 'Geolocation is not supported by this browser.';
+            routeSummary.textContent = 'Unable to display a location-based route on this browser.';
+            return;
+        }
+
+        routeStatus.textContent = 'Requesting your current location...';
+        navigator.geolocation.getCurrentPosition(async function (position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const userPoint = [lat, lon];
+
+            try {
+                const geodata = await reverseGeocode(lat, lon);
+                const address = geodata.address || {};
+                const rawProvince = address.state || address.county || '';
+                const province = normalizeProvince(rawProvince);
+
+                detectedAddress.textContent = geodata.display_name || `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                routeStatus.textContent = province
+                    ? `Location detected in ${province}.`
+                    : 'Location detected. Province is not in predefined list, using local route model.';
+
+                const profile = routeProfiles[province];
+                const points = profile
+                    ? [userPoint, profile.transfer, profile.processing]
+                    : fallbackRouteFromLocation(userPoint);
+
+                updateRouteMap(points, province || 'your area');
+            } catch (error) {
+                detectedAddress.textContent = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                routeStatus.textContent = 'Location detected. Using coordinate-based route.';
+                updateRouteMap(fallbackRouteFromLocation(userPoint), 'your area');
+            }
+        }, function (error) {
+            const message = error.code === 1
+                ? 'Location access denied. Please allow location permission to view your route.'
+                : 'Could not get your location. Please try again.';
+            routeStatus.textContent = message;
+            routeSummary.textContent = 'Location is required to generate route from your address.';
+        }, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        });
+    }
+
+    if (retryLocationBtn) {
+        retryLocationBtn.addEventListener('click', locateAndRenderRoute);
+    }
+
+    initializeRouteMap();
+    locateAndRenderRoute();
 </script>
 {% endblock %}

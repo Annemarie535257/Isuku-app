@@ -61,6 +61,7 @@ urlpatterns = [
     path('api/sectors/', views.get_sectors, name='get_sectors'),
     path('api/cells/', views.get_cells, name='get_cells'),
     path('api/villages/', views.get_villages, name='get_villages'),
+    path('api/analyze-waste-image/', views.analyze_waste_image, name='analyze_waste_image'),
     
     # OTP endpoints
     path('api/send-otp/', views.request_otp, name='send_otp'),

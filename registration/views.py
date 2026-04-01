@@ -1335,6 +1335,63 @@ def get_villages(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
+def _classify_waste_from_metadata(file_name, content_type):
+    """Classify waste type from file metadata using keyword heuristics."""
+    keyword_map = {
+        'Organic': ['banana', 'food', 'organic', 'peel', 'fruit', 'vegetable', 'compost'],
+        'Plastic': ['plastic', 'bottle', 'pet', 'container', 'wrapper'],
+        'Paper': ['paper', 'cardboard', 'carton', 'newspaper', 'book'],
+        'Glass': ['glass', 'jar', 'broke', 'bottle-glass'],
+        'Metal': ['metal', 'can', 'aluminium', 'aluminum', 'steel', 'tin'],
+    }
+
+    text = f"{file_name} {content_type}".lower()
+    best_label = 'General'
+    best_score = 0
+
+    for label, keywords in keyword_map.items():
+        score = sum(1 for keyword in keywords if keyword in text)
+        if score > best_score:
+            best_label = label
+            best_score = score
+
+    confidence = 0.52 if best_score == 0 else min(0.93, 0.62 + (best_score * 0.1))
+    return best_label, round(confidence * 100, 1)
+
+
+@require_http_methods(["POST"])
+def analyze_waste_image(request):
+    """Analyze uploaded image metadata and return suggested waste category."""
+    uploaded_file = request.FILES.get('waste_image')
+    if not uploaded_file:
+        return JsonResponse({'error': 'Please upload an image first.'}, status=400)
+
+    category_label, confidence = _classify_waste_from_metadata(
+        uploaded_file.name,
+        getattr(uploaded_file, 'content_type', ''),
+    )
+
+    matching_category = WasteCategory.objects.filter(name__iexact=category_label).first()
+    response_category = matching_category.name if matching_category else category_label
+
+    disposal_tips = {
+        'Organic': 'Compost this waste or place it in the organic waste bin.',
+        'Plastic': 'Rinse and place in the plastic recycling stream.',
+        'Paper': 'Keep dry and place in paper/cardboard recycling.',
+        'Glass': 'Handle safely and place in the glass recycling stream.',
+        'Metal': 'Clean and place in the metal recycling stream.',
+        'General': 'Place in mixed waste if no recycling stream applies.',
+    }
+
+    return JsonResponse({
+        'success': True,
+        'file_name': uploaded_file.name,
+        'category': response_category,
+        'confidence': confidence,
+        'tip': disposal_tips.get(response_category, disposal_tips['General']),
+    })
+
+
 # OTP Endpoints
 import random
 from django.views.decorators.csrf import csrf_exempt
