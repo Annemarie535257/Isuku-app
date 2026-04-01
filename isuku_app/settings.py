@@ -24,6 +24,7 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -36,6 +37,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Add WhiteNoise for static files
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     # 'django.middleware.locale.LocaleMiddleware',  # Disabled - using JavaScript translations instead
     'django.middleware.common.CommonMiddleware',
@@ -181,6 +183,13 @@ CSRF_TRUSTED_ORIGINS = os.environ.get(
     'CSRF_TRUSTED_ORIGINS',
     'https://isuku-app.onrender.com'
 ).split(',')
+
+# CORS for separated frontend deployment (Netlify/Vercel/etc.)
+CORS_ALLOWED_ORIGINS = os.environ.get(
+    'CORS_ALLOWED_ORIGINS',
+    'https://isuku.netlify.app'
+).split(',')
+CORS_ALLOW_CREDENTIALS = True
 
 # Basic logging to surface errors in Render logs
 LOGGING = {

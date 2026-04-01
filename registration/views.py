@@ -1359,6 +1359,7 @@ def _classify_waste_from_metadata(file_name, content_type):
     return best_label, round(confidence * 100, 1)
 
 
+@csrf_exempt
 @require_http_methods(["POST"])
 def analyze_waste_image(request):
     """Analyze uploaded image metadata and return suggested waste category."""
