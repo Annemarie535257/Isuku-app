@@ -1,15 +1,15 @@
 # Backend (Render)
 
-This folder documents backend deployment for the Django API hosted on Render.
+This folder contains the full Django backend for Render deployment.
 
 ## Current backend source
-The active Django backend source remains at repository root:
+The active Django backend source is in this folder:
 - isuku_app/
 - registration/
 - manage.py
 
 ## Render deployment
-Use `render.yaml` and `build.sh` from repository root.
+Use `render.yaml` and `build.sh` in this folder.
 
 ## Required environment variables
 - SECRET_KEY

@@ -3,6 +3,7 @@ services:
     name: isuku-app
     env: python
     plan: starter
+    rootDir: backend
     buildCommand: pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py collectstatic --noinput
     startCommand: gunicorn isuku_app.wsgi:application
     envVars:
@@ -21,4 +22,3 @@ services:
       - key: CORS_ALLOWED_ORIGINS
         value: https://isuku.netlify.app
     healthCheckPath: /
-

@@ -4,17 +4,17 @@
 - Path: `frontend/`
 - Hosting target: Netlify
 - Base directory in Netlify: `frontend`
-- Publish directory: `.`
-- Build command: leave empty (static app)
+- Build command: `npm run build`
+- Publish directory: `dist`
 
 ## Backend folder
-- Path: `backend/` (documentation)
+- Path: `backend/`
 - Hosting target: Render
-- Backend source currently remains in repo root.
+- Django source now lives in this folder.
 
 ## API Base URL
-In `frontend/index.html`:
-`window.API_BASE_URL = "https://isuku-app.onrender.com";`
+In Netlify env vars:
+`VITE_API_BASE_URL=https://isuku-app.onrender.com`
 
 ## Backend CORS
 Django now allows cross-origin calls via `CORS_ALLOWED_ORIGINS` setting.
@@ -22,5 +22,5 @@ Django now allows cross-origin calls via `CORS_ALLOWED_ORIGINS` setting.
 ## Netlify settings
 - Branch: `main`
 - Base directory: `frontend`
-- Build command: (empty)
-- Publish directory: `.`
+- Build command: `npm run build`
+- Publish directory: `dist`

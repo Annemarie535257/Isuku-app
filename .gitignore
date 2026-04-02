@@ -27,6 +27,9 @@ db.sqlite3
 db.sqlite3-journal
 /staticfiles/
 /media/
+/backend/staticfiles/
+/backend/media/
+/backend/db.sqlite3
 
 # Virtual Environment
 venv/
