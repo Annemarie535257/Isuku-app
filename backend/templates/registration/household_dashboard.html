@@ -1457,7 +1457,7 @@
         const allPredictions = document.getElementById('allPredictions');
         const useClassificationBtn = document.getElementById('useClassificationBtn');
         const retakePhotoBtn = document.getElementById('retakePhotoBtn');
-        const wasteCategorySelect = document.getElementById('wasteCategorySelect');
+        const wasteCategorySelectById = document.getElementById('wasteCategorySelect');
         
         // Handle Take Photo button
         if (takePhotoBtn && wasteImageInputCamera) {
@@ -1530,9 +1530,9 @@
         if (useClassificationBtn) {
             useClassificationBtn.addEventListener('click', function() {
                 const categoryId = this.getAttribute('data-category-id');
-                if (categoryId && wasteCategorySelect) {
-                    wasteCategorySelect.value = categoryId;
-                    wasteCategorySelect.dispatchEvent(new Event('change'));
+                if (categoryId && wasteCategorySelectById) {
+                    wasteCategorySelectById.value = categoryId;
+                    wasteCategorySelectById.dispatchEvent(new Event('change'));
                 }
             });
         }
@@ -1926,7 +1926,30 @@
         background: white;
         border-top: 1px solid #e5e7eb;
         display: flex;
+        flex-wrap: wrap;
         gap: 8px;
+    }
+
+    .chatbot-language-row {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 2px;
+        font-size: 12px;
+        color: #6b7280;
+        font-weight: 600;
+    }
+
+    .chatbot-language-select {
+        min-width: 160px;
+        border: 1px solid #d1d5db;
+        border-radius: 9999px;
+        padding: 8px 12px;
+        font-size: 13px;
+        outline: none;
+        background: #fff;
     }
     
     .chatbot-input {
@@ -1992,11 +2015,19 @@
             <button class="chatbot-close" id="chatbotClose" aria-label="Close chatbot">×</button>
         </div>
         <div class="chatbot-messages" id="chatbotMessages">
-            <div class="chatbot-message bot">
+            <div class="chatbot-message bot" id="chatbotGreeting">
                 Hello! I'm Isuku Assistant. How can I help you with waste management today?
             </div>
         </div>
         <div class="chatbot-input-container">
+            <div class="chatbot-language-row">
+                <span>Response language</span>
+                <select id="chatbotLanguage" class="chatbot-language-select" aria-label="Response language">
+                    <option value="en">English</option>
+                    <option value="rw">Kinyarwanda</option>
+                    <option value="fr">Français</option>
+                </select>
+            </div>
             <input 
                 type="text" 
                 class="chatbot-input" 
@@ -2020,6 +2051,32 @@
         const chatbotMessages = document.getElementById('chatbotMessages');
         const chatbotInput = document.getElementById('chatbotInput');
         const chatbotSend = document.getElementById('chatbotSend');
+        const chatbotLanguage = document.getElementById('chatbotLanguage');
+        const chatbotGreeting = document.getElementById('chatbotGreeting');
+
+        const greetings = {
+            en: "Hello! I'm Isuku Assistant. How can I help you with waste management today?",
+            rw: "Muraho! Ndi Isuku Assistant. Nabafasha gute ku bijyanye no gucunga imyanda uyu munsi?",
+            fr: "Bonjour ! Je suis Isuku Assistant. Comment puis-je vous aider avec la gestion des déchets aujourd'hui ?"
+        };
+
+        const placeholders = {
+            en: 'Type your question...',
+            rw: 'Andika ikibazo cyawe...',
+            fr: 'Tapez votre question...'
+        };
+
+        function updateChatLanguage() {
+            const selected = chatbotLanguage.value;
+            chatbotInput.placeholder = placeholders[selected] || placeholders.en;
+
+            if (chatbotMessages.children.length === 1 && chatbotGreeting) {
+                chatbotGreeting.textContent = greetings[selected] || greetings.en;
+            }
+        }
+
+        chatbotLanguage.addEventListener('change', updateChatLanguage);
+        updateChatLanguage();
         
         let isOpen = false;
         
@@ -2090,7 +2147,7 @@
                         'Content-Type': 'application/json',
                         'X-CSRFToken': csrftoken
                     },
-                    body: JSON.stringify({ question: question })
+                    body: JSON.stringify({ question: question, language: chatbotLanguage.value })
                 });
                 
                 const data = await response.json();

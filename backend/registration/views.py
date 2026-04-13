@@ -1477,6 +1477,7 @@ def chatbot_api(request):
     try:
         data = json.loads(request.body)
         question = data.get('question', '').strip()
+        language = data.get('language', 'auto')
         
         if not question:
             return JsonResponse({
@@ -1488,10 +1489,11 @@ def chatbot_api(request):
         from .chatbot_service import generate_response
         
         # Generate response
-        response = generate_response(question, max_length=256, temperature=0.7)
+        response = generate_response(question, max_length=256, temperature=0.7, language=language)
         
         return JsonResponse({
             'response': response,
+            'language': language,
             'success': True
         }, status=200)
         

@@ -1,8 +1,20 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const API_BASE_URL = (
   import.meta.env.VITE_API_BASE_URL || "https://isuku-app.onrender.com"
 ).replace(/\/$/, "");
+
+const CHAT_GREETINGS = {
+  en: "Hello! I am Isuku Assistant. Ask me about pickup, sorting, or collectors.",
+  rw: "Muraho! Ndi Isuku Assistant. Nyibaze ku gusaba gukusanya, gutondeka imyanda, cyangwa abakusanya.",
+  fr: "Bonjour ! Je suis Isuku Assistant. Posez-moi des questions sur la collecte, le tri ou les collecteurs.",
+};
+
+const CHAT_PLACEHOLDERS = {
+  en: "Ask about pickup, sorting, or routes",
+  rw: "Baza ku gukusanya, gutondeka, cyangwa inzira",
+  fr: "Posez une question sur la collecte, le tri ou les trajets",
+};
 
 function App() {
   const [healthText, setHealthText] = useState("Idle");
@@ -10,12 +22,35 @@ function App() {
   const [previewUrl, setPreviewUrl] = useState("");
   const [selectedName, setSelectedName] = useState("No image selected");
   const [isBusy, setIsBusy] = useState(false);
+  const [chatLanguage, setChatLanguage] = useState("en");
+  const [chatText, setChatText] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatMessages, setChatMessages] = useState([
+    {
+      role: "bot",
+      text: CHAT_GREETINGS.en,
+    },
+  ]);
 
   const galleryInputRef = useRef(null);
   const cameraInputRef = useRef(null);
   const selectedFileRef = useRef(null);
 
   const apiTag = useMemo(() => `API: ${API_BASE_URL}`, []);
+
+  useEffect(() => {
+    setChatMessages((previousMessages) => {
+      if (
+        previousMessages.length === 1 &&
+        previousMessages[0]?.role === "bot" &&
+        Object.values(CHAT_GREETINGS).includes(previousMessages[0].text)
+      ) {
+        return [{ role: "bot", text: CHAT_GREETINGS[chatLanguage] || CHAT_GREETINGS.en }];
+      }
+
+      return previousMessages;
+    });
+  }, [chatLanguage]);
 
   const setSelectedFile = (file) => {
     selectedFileRef.current = file || null;
@@ -65,6 +100,41 @@ function App() {
       setAnalysisText(`Error: ${error.message}`);
     } finally {
       setIsBusy(false);
+    }
+  };
+
+  const sendChatMessage = async () => {
+    const question = chatText.trim();
+    if (!question || chatLoading) {
+      return;
+    }
+
+    setChatMessages((prev) => [...prev, { role: "user", text: question }]);
+    setChatText("");
+    setChatLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/chatbot/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ question, language: chatLanguage }),
+      });
+      const payload = await response.json();
+
+      if (!response.ok || !payload.success) {
+        throw new Error(payload.error || "Chatbot request failed");
+      }
+
+      setChatMessages((prev) => [...prev, { role: "bot", text: payload.response }]);
+    } catch (error) {
+      setChatMessages((prev) => [
+        ...prev,
+        { role: "bot", text: `I am having trouble right now: ${error.message}` },
+      ]);
+    } finally {
+      setChatLoading(false);
     }
   };
 
@@ -134,6 +204,52 @@ function App() {
               {isBusy ? "Analyzing..." : "Analyze image"}
             </button>
             <pre className="output">{analysisText}</pre>
+          </article>
+
+          <article className="card chat-card">
+            <h2>Isuku Assistant</h2>
+            <p className="hint">Connected to backend endpoint: /api/chatbot/</p>
+
+            <div className="chat-toolbar">
+              <label className="chat-language-label" htmlFor="chat-language-select">
+                Response language
+              </label>
+              <select
+                id="chat-language-select"
+                className="chat-language-select"
+                value={chatLanguage}
+                onChange={(event) => setChatLanguage(event.target.value)}
+              >
+                <option value="en">English</option>
+                <option value="rw">Kinyarwanda</option>
+                <option value="fr">Français</option>
+              </select>
+            </div>
+
+            <div className="chat-stream">
+              {chatMessages.map((message, index) => (
+                <div key={index} className={`chat-bubble ${message.role}`}>
+                  {message.text}
+                </div>
+              ))}
+              {chatLoading && <div className="chat-bubble bot">Thinking...</div>}
+            </div>
+
+            <div className="chat-controls">
+              <input
+                value={chatText}
+                onChange={(event) => setChatText(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    sendChatMessage();
+                  }
+                }}
+                placeholder={CHAT_PLACEHOLDERS[chatLanguage] || CHAT_PLACEHOLDERS.en}
+              />
+              <button className="btn" onClick={sendChatMessage} disabled={chatLoading}>
+                Send
+              </button>
+            </div>
           </article>
         </section>
       </main>

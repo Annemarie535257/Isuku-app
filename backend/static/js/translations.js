@@ -141,6 +141,86 @@ const translations = {
         "Help & Support": "Help & Support",
         "History": "History",
         "Settings": "Settings",
+        "LOGIN": "LOGIN",
+        "Get Started": "Get Started",
+        "Services": "Services",
+        "AI SORTING": "AI SORTING",
+        "ROUTING MAP": "ROUTING MAP",
+        "English": "English",
+        "Kinyarwanda": "Kinyarwanda",
+        "Français": "Français",
+        "Search...": "Search...",
+        "View Profile": "View Profile",
+        "Request Pickup": "Request Pickup",
+        "Household Dashboard": "Household Dashboard",
+        "Manage your waste pickup requests and view your profile": "Manage your waste pickup requests and view your profile",
+        "My Profile": "My Profile",
+        "Pickup History": "Pickup History",
+        "Total Requests": "Total Requests",
+        "Pending": "Pending",
+        "Total Waste": "Total Waste",
+        "Waste by Category": "Waste by Category",
+        "My Pickup Requests": "My Pickup Requests",
+        "Service Area Map": "Service Area Map",
+        "Nearby Collectors": "Nearby Collectors",
+        "Filter by Category": "Filter by Category",
+        "Nearby Pickup Requests": "Nearby Pickup Requests",
+        "Available Pickups Near You": "Available Pickups Near You",
+        "Update My Location": "Update My Location",
+        "Collector Dashboard": "Collector Dashboard",
+        "Manage your pickup assignments and routes": "Manage your pickup assignments and routes",
+        "Assigned": "Assigned",
+        "Available": "Available",
+        "My Assigned Pickups": "My Assigned Pickups",
+        "Available Pickups": "Available Pickups",
+        "Assigned Pickups": "Assigned Pickups",
+        "Available Requests": "Available Requests",
+        "No assigned pickups yet.": "No assigned pickups yet.",
+        "No available pickups right now.": "No available pickups right now.",
+        "Check your email": "Check your email",
+        "Back to login": "Back to login",
+        "Set a new password": "Set a new password",
+        "New password": "New password",
+        "Confirm new password": "Confirm new password",
+        "Change password": "Change password",
+        "Password changed": "Password changed",
+        "Go to login": "Go to login",
+        "Reset your password": "Reset your password",
+        "Email address": "Email address",
+        "Send reset link": "Send reset link",
+        "Request a new link": "Request a new link",
+        "Toggle menu": "Toggle menu",
+        "Status": "Status",
+        "Unavailable": "Unavailable",
+        "Area": "Area",
+        "Not set": "Not set",
+        "Navigation": "Navigation",
+        "My Assignments": "My Assignments",
+        "Request": "Request",
+        "Assign to me": "Assign to me",
+        "No new notifications": "No new notifications",
+        "Name": "Name",
+        "Verification": "Verification",
+        "Verified": "Verified",
+        "Not provided": "Not provided",
+        "Your Location": "Your Location",
+        "km away": "km away",
+        "Pickup": "Pickup",
+        "Quick Actions": "Quick Actions",
+        "Monitor system statistics and manage users": "Monitor system statistics and manage users",
+        "Django Admin": "Django Admin",
+        "Pending Pickups": "Pending Pickups",
+        "Completed Pickups": "Completed Pickups",
+        "Recent Pickups": "Recent Pickups",
+        "No recent pickups": "No recent pickups",
+        "Filter Pickups": "Filter Pickups",
+        "All Statuses": "All Statuses",
+        "Scheduled": "Scheduled",
+        "Cancelled": "Cancelled",
+        "Filter": "Filter",
+        "Admin Panel": "Admin Panel",
+        "Manage Households": "Manage Households",
+        "Manage Collectors": "Manage Collectors",
     },
     rw: {
         "HOME": "AYANZU",
@@ -283,6 +363,86 @@ const translations = {
         "Help & Support": "Ubufasha n'Inkunga",
         "History": "Amateka",
         "Settings": "Igenamiterere",
+        "LOGIN": "INJIRA",
+        "Get Started": "Tangira",
+        "Services": "Serivisi",
+        "AI SORTING": "AI GUTONDEKANYA",
+        "ROUTING MAP": "IKARITA Y'INZIRA",
+        "English": "Icyongereza",
+        "Kinyarwanda": "Ikinyarwanda",
+        "Français": "Igifaransa",
+        "Search...": "Shakisha...",
+        "View Profile": "Reba Umwirondoro",
+        "Request Pickup": "Saba Gukusanya",
+        "Household Dashboard": "Ikibaho cy'Urugo",
+        "Manage your waste pickup requests and view your profile": "Gucunga ibisabwa byo gukusanya imyanda no kureba umwirondoro wawe",
+        "My Profile": "Umwirondoro Wanjye",
+        "Pickup History": "Amateka yo Gukusanya",
+        "Total Requests": "Ibyifuzo Byose",
+        "Pending": "Biracyategereje",
+        "Total Waste": "Imyanda Yose",
+        "Waste by Category": "Imyanda Ukurikije Icyiciro",
+        "My Pickup Requests": "Ibyifuzo Byanjye byo Gukusanya",
+        "Service Area Map": "Ikarita y'Agace ka Serivisi",
+        "Nearby Collectors": "Abakusanya Bari Hafi",
+        "Filter by Category": "Shungura ukurikije Icyiciro",
+        "Nearby Pickup Requests": "Ibisabwa byo Gukusanya Hafi",
+        "Available Pickups Near You": "Ibikusanywa Biboneka Hafi Yawe",
+        "Update My Location": "Hindura Ahantu Ndi",
+        "Collector Dashboard": "Ikibaho cy'Umukusanya",
+        "Manage your pickup assignments and routes": "Gucunga inshingano zawe zo gukusanya n'inzira",
+        "Assigned": "Byagenewe",
+        "Available": "Birahari",
+        "My Assigned Pickups": "Ibikusanywa Nahawe",
+        "Available Pickups": "Ibikusanywa Biboneka",
+        "Assigned Pickups": "Ibikusanywa Byagenewe",
+        "Available Requests": "Ibisabwa Biboneka",
+        "No assigned pickups yet.": "Nta bikusanywa byahawe kugeza ubu.",
+        "No available pickups right now.": "Nta bikusanywa biboneka ubu.",
+        "Check your email": "Reba imeyili yawe",
+        "Back to login": "Subira ku kwinjira",
+        "Set a new password": "Shyiraho ijambobanga rishya",
+        "New password": "Ijambobanga rishya",
+        "Confirm new password": "Emeza ijambobanga rishya",
+        "Change password": "Hindura ijambobanga",
+        "Password changed": "Ijambobanga ryahinduwe",
+        "Go to login": "Jya ku kwinjira",
+        "Reset your password": "Subizaho ijambobanga",
+        "Email address": "Aderesi ya imeyili",
+        "Send reset link": "Ohereza umurongo wo gusubizaho",
+        "Request a new link": "Saba umurongo mushya",
+        "Toggle menu": "Hindura menu",
+        "Status": "Imiterere",
+        "Unavailable": "Ntiboneka",
+        "Area": "Agace",
+        "Not set": "Ntabwo byashyizweho",
+        "Navigation": "Iyobora",
+        "My Assignments": "Inshingano Zanjye",
+        "Request": "Icyifuzo",
+        "Assign to me": "Mpihe",
+        "No new notifications": "Nta matangazo mashya",
+        "Name": "Izina",
+        "Verification": "Iyemeza",
+        "Verified": "Byemejwe",
+        "Not provided": "Ntabwo yatanzwe",
+        "Your Location": "Aho uri",
+        "km away": "km kure",
+        "Pickup": "Gukusanya",
+        "Quick Actions": "Ibikorwa Byihuse",
+        "Monitor system statistics and manage users": "Kurikirana imibare ya sisitemu no gucunga abakoresha",
+        "Django Admin": "Django Admin",
+        "Pending Pickups": "Ibikusanywa Bitegereje",
+        "Completed Pickups": "Ibikusanywa Byarangiye",
+        "Recent Pickups": "Ibikusanywa Bya vuba",
+        "No recent pickups": "Nta bikusanywa bya vuba",
+        "Filter Pickups": "Shungura ibikusanywa",
+        "All Statuses": "Imiterere yose",
+        "Scheduled": "Byashyizwe ku ngengabihe",
+        "Cancelled": "Byahagaritswe",
+        "Filter": "Shungura",
+        "Admin Panel": "Umwanya wa Admin",
+        "Manage Households": "Cunga Amazu",
+        "Manage Collectors": "Cunga Abakusanya",
     },
     fr: {
         "HOME": "ACCUEIL",
@@ -425,6 +585,86 @@ const translations = {
         "Help & Support": "Aide et Support",
         "History": "Historique",
         "Settings": "Paramètres",
+        "LOGIN": "CONNEXION",
+        "Get Started": "Commencer",
+        "Services": "Services",
+        "AI SORTING": "TRI IA",
+        "ROUTING MAP": "CARTE D'ITINERAIRE",
+        "English": "Anglais",
+        "Kinyarwanda": "Kinyarwanda",
+        "Français": "Français",
+        "Search...": "Rechercher...",
+        "View Profile": "Voir le Profil",
+        "Request Pickup": "Demander une Collecte",
+        "Household Dashboard": "Tableau de Bord Menage",
+        "Manage your waste pickup requests and view your profile": "Gerez vos demandes de collecte et consultez votre profil",
+        "My Profile": "Mon Profil",
+        "Pickup History": "Historique des Collectes",
+        "Total Requests": "Demandes Totales",
+        "Pending": "En attente",
+        "Total Waste": "Dechets Totaux",
+        "Waste by Category": "Dechets par Categorie",
+        "My Pickup Requests": "Mes Demandes de Collecte",
+        "Service Area Map": "Carte de Zone de Service",
+        "Nearby Collectors": "Collecteurs a Proximite",
+        "Filter by Category": "Filtrer par Categorie",
+        "Nearby Pickup Requests": "Demandes de Collecte a Proximite",
+        "Available Pickups Near You": "Collectes Disponibles Pres de Vous",
+        "Update My Location": "Mettre a Jour Ma Position",
+        "Collector Dashboard": "Tableau de Bord Collecteur",
+        "Manage your pickup assignments and routes": "Gerez vos affectations de collecte et vos trajets",
+        "Assigned": "Assigne",
+        "Available": "Disponible",
+        "My Assigned Pickups": "Mes Collectes Assignees",
+        "Available Pickups": "Collectes Disponibles",
+        "Assigned Pickups": "Collectes Assignees",
+        "Available Requests": "Demandes Disponibles",
+        "No assigned pickups yet.": "Aucune collecte assignee pour le moment.",
+        "No available pickups right now.": "Aucune collecte disponible pour le moment.",
+        "Check your email": "Verifiez votre email",
+        "Back to login": "Retour a la connexion",
+        "Set a new password": "Definir un nouveau mot de passe",
+        "New password": "Nouveau mot de passe",
+        "Confirm new password": "Confirmer le nouveau mot de passe",
+        "Change password": "Changer le mot de passe",
+        "Password changed": "Mot de passe modifie",
+        "Go to login": "Aller a la connexion",
+        "Reset your password": "Reinitialiser votre mot de passe",
+        "Email address": "Adresse email",
+        "Send reset link": "Envoyer le lien de reinitialisation",
+        "Request a new link": "Demander un nouveau lien",
+        "Toggle menu": "Basculer le menu",
+        "Status": "Statut",
+        "Unavailable": "Indisponible",
+        "Area": "Zone",
+        "Not set": "Non defini",
+        "Navigation": "Navigation",
+        "My Assignments": "Mes Affectations",
+        "Request": "Demande",
+        "Assign to me": "M'assigner",
+        "No new notifications": "Aucune nouvelle notification",
+        "Name": "Nom",
+        "Verification": "Verification",
+        "Verified": "Verifie",
+        "Not provided": "Non renseigne",
+        "Your Location": "Votre position",
+        "km away": "km de distance",
+        "Pickup": "Collecte",
+        "Quick Actions": "Actions Rapides",
+        "Monitor system statistics and manage users": "Surveiller les statistiques du systeme et gerer les utilisateurs",
+        "Django Admin": "Admin Django",
+        "Pending Pickups": "Collectes en attente",
+        "Completed Pickups": "Collectes terminees",
+        "Recent Pickups": "Collectes recentes",
+        "No recent pickups": "Aucune collecte recente",
+        "Filter Pickups": "Filtrer les collectes",
+        "All Statuses": "Tous les statuts",
+        "Scheduled": "Planifie",
+        "Cancelled": "Annule",
+        "Filter": "Filtrer",
+        "Admin Panel": "Panneau Admin",
+        "Manage Households": "Gerer les Menages",
+        "Manage Collectors": "Gerer les Collecteurs",
     }
 };
 
@@ -432,6 +672,7 @@ const translations = {
 const TranslationManager = {
     currentLanguage: 'en',
     elementMap: new Map(), // Store element and its translation key mapping
+    observer: null,
     
     init() {
         // Get language from storage or cookie (cookie takes precedence for cross-page persistence)
@@ -453,6 +694,7 @@ const TranslationManager = {
             // Small delay to ensure all elements are rendered
             setTimeout(() => {
                 this.applyTranslations();
+                this.observeDomMutations();
             }, 50);
         };
         
@@ -498,7 +740,28 @@ const TranslationManager = {
         
         // Apply translations immediately
         this.applyTranslations();
+        document.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
         return true;
+    },
+
+    normalizeText(text) {
+        return (text || '').replace(/\s+/g, ' ').trim();
+    },
+
+    getTranslationForText(text) {
+        const key = this.normalizeText(text);
+        if (!key) return null;
+        const value = this.translate(key);
+        return value && value !== key ? value : null;
+    },
+
+    shouldSkipElement(element) {
+        if (!element || !element.tagName) return true;
+        const tag = element.tagName;
+        if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'CODE', 'PRE'].includes(tag)) return true;
+        if (element.closest('[data-no-translate="true"]')) return true;
+        if (element.classList && element.classList.contains('notranslate')) return true;
+        return false;
     },
     
     applyTranslations() {
@@ -557,8 +820,113 @@ const TranslationManager = {
                 translated++;
             }
         });
+
+        // Handle aria-label translations
+        document.querySelectorAll('[data-translate-aria-label]').forEach(element => {
+            const key = element.getAttribute('data-translate-aria-label');
+            const translation = this.translate(key);
+            if (translation && translation !== key) {
+                element.setAttribute('aria-label', translation);
+                translated++;
+            }
+        });
+
+        // Translate input placeholders and values even without explicit attributes.
+        document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(element => {
+            const originalPlaceholder = element.getAttribute('data-original-placeholder') || element.placeholder;
+            if (!element.getAttribute('data-original-placeholder')) {
+                element.setAttribute('data-original-placeholder', originalPlaceholder || '');
+            }
+            const placeholderTranslation = this.getTranslationForText(originalPlaceholder);
+            if (placeholderTranslation) {
+                element.placeholder = placeholderTranslation;
+            }
+        });
+
+        document.querySelectorAll('input[type="submit"], input[type="button"], button').forEach(element => {
+            if (this.shouldSkipElement(element)) return;
+
+            // Value-based controls
+            if (element.tagName === 'INPUT' && element.value) {
+                const originalValue = element.getAttribute('data-original-value') || element.value;
+                if (!element.getAttribute('data-original-value')) {
+                    element.setAttribute('data-original-value', originalValue);
+                }
+                const valueTranslation = this.getTranslationForText(originalValue);
+                if (valueTranslation) {
+                    element.value = valueTranslation;
+                }
+                return;
+            }
+
+            // Text button controls without data-translate.
+            if (!element.hasAttribute('data-translate')) {
+                this.autoTranslateElementText(element);
+            }
+        });
+
+        // Translate plain text elements that do not explicitly declare data-translate.
+        document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, a, span, label, th, td, li, small, strong, div').forEach(element => {
+            if (this.shouldSkipElement(element)) return;
+            if (element.hasAttribute('data-translate')) return;
+            if (element.children.length > 0 && element.querySelector('[data-translate]')) return;
+            this.autoTranslateElementText(element);
+        });
+
+        // Translate page title if translation key exists.
+        if (document && document.title) {
+            const titleTranslation = this.getTranslationForText(document.title);
+            if (titleTranslation) {
+                document.title = titleTranslation;
+            }
+        }
         
         console.log(`✅ Translated ${translated} elements, skipped ${skipped}`);
+    },
+
+    autoTranslateElementText(element) {
+        if (!element) return;
+        const currentText = this.normalizeText(element.textContent);
+        if (!currentText) return;
+
+        // Prevent reusing translated text as source key.
+        if (!element.getAttribute('data-original-text')) {
+            element.setAttribute('data-original-text', currentText);
+        }
+
+        const sourceText = element.getAttribute('data-original-text') || currentText;
+        const translatedText = this.getTranslationForText(sourceText);
+        if (!translatedText) return;
+
+        this.replaceElementText(element, sourceText, translatedText);
+    },
+
+    observeDomMutations() {
+        if (this.observer) return;
+
+        this.observer = new MutationObserver((mutations) => {
+            let shouldReapply = false;
+            for (const mutation of mutations) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    shouldReapply = true;
+                    break;
+                }
+                if (mutation.type === 'characterData') {
+                    shouldReapply = true;
+                    break;
+                }
+            }
+
+            if (shouldReapply) {
+                this.applyTranslations();
+            }
+        });
+
+        this.observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+        });
     },
     
     replaceElementText(element, key, translation) {

@@ -49,11 +49,65 @@
         .text-blue-600 { color: #2563eb; }
         .bg-purple-50 { background-color: #f5f3ff; }
         .text-purple-600 { color: #9333ea; }
+
+        /* Global language switcher for non-landing pages */
+        .global-language-switcher {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 999;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid #d1d5db;
+            border-radius: 9999px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.15);
+            backdrop-filter: blur(6px);
+        }
+
+        .global-language-switcher select {
+            border: 0;
+            background: transparent;
+            color: #111827;
+            font-size: 13px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+            min-width: 108px;
+        }
+
+        .global-language-switcher i {
+            color: #3f6f2a;
+        }
+
+        @media (max-width: 768px) {
+            .global-language-switcher {
+                right: 10px;
+                bottom: 10px;
+                padding: 7px 8px;
+            }
+            .global-language-switcher select {
+                min-width: 92px;
+                font-size: 12px;
+            }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-gray-50">
     {% block content %}{% endblock %}
+
+    <div id="globalLanguageSwitcher" class="global-language-switcher" style="display:none;">
+        <i class="fas fa-globe"></i>
+        <select id="globalLanguageSelect" aria-label="Select language">
+            <option value="en">English</option>
+            <option value="rw">Kinyarwanda</option>
+            <option value="fr">Francais</option>
+        </select>
+    </div>
+
     <!-- Fallback: if TranslationManager didn't initialize, try injecting script once more -->
     <script>
         window.addEventListener('load', function () {
@@ -66,6 +120,38 @@
                 } catch (e) {
                     console && console.warn && console.warn('Translation script fallback failed:', e);
                 }
+            }
+
+            try {
+                var isLanding = window.location.pathname === '/' || window.location.pathname === '';
+                var switcher = document.getElementById('globalLanguageSwitcher');
+                var selector = document.getElementById('globalLanguageSelect');
+
+                if (switcher && selector && !isLanding) {
+                    if (document.querySelector('.language-dropdown')) {
+                        return;
+                    }
+                    switcher.style.display = 'inline-flex';
+
+                    var syncSelector = function () {
+                        if (window.TranslationManager && window.TranslationManager.getCurrentLanguage) {
+                            selector.value = window.TranslationManager.getCurrentLanguage();
+                        }
+                    };
+
+                    syncSelector();
+
+                    selector.addEventListener('change', function () {
+                        if (window.TranslationManager && window.TranslationManager.setLanguage) {
+                            window.TranslationManager.setLanguage(selector.value);
+                        }
+                    });
+
+                    // Keep selector synced if language is changed elsewhere.
+                    document.addEventListener('languageChanged', syncSelector);
+                }
+            } catch (e) {
+                console && console.warn && console.warn('Global language switcher init failed:', e);
             }
         });
     </script>

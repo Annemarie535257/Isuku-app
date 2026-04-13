@@ -4,15 +4,25 @@
 
 {% block extra_css %}
 <style>
+    :root {
+        --collector-bg: linear-gradient(145deg, #f0fdf4 0%, #ecfeff 45%, #f8fafc 100%);
+        --collector-surface: #ffffff;
+        --collector-border: #e2e8f0;
+        --collector-text: #0f172a;
+        --collector-muted: #64748b;
+        --collector-accent: #16a34a;
+        --collector-accent-dark: #15803d;
+        --collector-sidebar: #064e3b;
+    }
     .dashboard-wrapper {
         display: flex;
         min-height: 100vh;
-        background: #f3f4f6;
+        background: var(--collector-bg);
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     .dashboard-sidebar {
         width: 220px;
-        background: #064e3b;
+        background: var(--collector-sidebar);
         color: white;
         display: flex;
         flex-direction: column;
@@ -51,6 +61,16 @@
         display: flex;
         flex-direction: column;
         gap: 4px;
+        flex: 1;
+    }
+    .sidebar-section-title {
+        padding: 8px 14px;
+        margin: 2px 8px 6px 8px;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #86efac;
+        font-weight: 700;
     }
     .menu-item {
         display: flex;
@@ -80,6 +100,18 @@
         color: #ffffff;
         box-shadow: 0 8px 20px rgba(16,185,129,0.35);
     }
+    .sidebar-footer {
+        padding: 10px 10px 16px 10px;
+        border-top: 1px solid rgba(255,255,255,0.12);
+        margin: 0 8px;
+    }
+    .logout-item {
+        color: #fecaca;
+    }
+    .logout-item:hover {
+        background: rgba(239, 68, 68, 0.18);
+        color: #fee2e2;
+    }
     .dashboard-main {
         flex: 1;
         margin-left: 220px;
@@ -96,6 +128,21 @@
         position: sticky;
         top: 0;
         z-index: 20;
+    }
+    .header-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .mobile-menu-btn {
+        display: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        background: #ffffff;
+        color: #374151;
+        cursor: pointer;
     }
     .header-profile {
         display: flex;
@@ -164,6 +211,37 @@
     .dashboard-content {
         padding: 20px 24px 32px 24px;
     }
+    .quick-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+    .quick-nav-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 9999px;
+        text-decoration: none;
+        border: 1px solid #dbe3ef;
+        background: rgba(255, 255, 255, 0.9);
+        color: #0f172a;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .quick-nav-link:hover {
+        transform: translateY(-1px);
+        border-color: #86efac;
+        color: #166534;
+    }
+    .quick-nav-link.active {
+        background: linear-gradient(135deg, #22c55e, #16a34a, #15803d);
+        color: #ffffff;
+        border-color: #16a34a;
+        box-shadow: 0 8px 20px rgba(22, 163, 74, 0.28);
+    }
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0,1fr));
@@ -211,10 +289,10 @@
         align-items: flex-start;
     }
     .content-card {
-        background: #ffffff;
+        background: var(--collector-surface);
         border-radius: 16px;
         padding: 18px 18px 20px 18px;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--collector-border);
         box-shadow: 0 10px 30px rgba(15,23,42,0.08);
     }
     .card-header {
@@ -226,7 +304,39 @@
     .card-title {
         font-size: 16px;
         font-weight: 700;
+        color: var(--collector-text);
+    }
+    .table-container {
+        overflow-x: auto;
+    }
+    .pickup-card {
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        padding: 12px;
+        background: #f9fafb;
+    }
+    .pickup-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .pickup-card-meta {
+        font-size: 13px;
+        color: #4b5563;
+        display: grid;
+        gap: 4px;
+    }
+    .pickup-card-title {
+        font-weight: 600;
         color: #111827;
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+    .address-cell {
+        max-width: 280px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .data-table {
         width: 100%;
@@ -278,6 +388,9 @@
     .empty-state-text {
         font-size: 14px;
     }
+    .dashboard-overlay {
+        display: none;
+    }
     @media (max-width: 1024px) {
         .stats-grid {
             grid-template-columns: repeat(2,minmax(0,1fr));
@@ -287,6 +400,11 @@
         }
     }
     @media (max-width: 768px) {
+        .mobile-menu-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
         .dashboard-sidebar {
             position: fixed;
             transform: translateX(-100%);
@@ -296,8 +414,67 @@
         .dashboard-sidebar.open {
             transform: translateX(0);
         }
+        .dashboard-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            z-index: 35;
+        }
+        .dashboard-overlay.active {
+            display: block;
+        }
         .dashboard-main {
             margin-left: 0;
+        }
+        .dashboard-header {
+            padding: 12px 14px;
+        }
+        .dashboard-content {
+            padding: 14px;
+        }
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        .stat-card {
+            padding: 12px;
+        }
+        .stat-card-value {
+            font-size: 19px;
+        }
+        .data-table {
+            font-size: 12px;
+        }
+        .data-table th,
+        .data-table td {
+            padding: 8px 6px;
+        }
+        .address-cell {
+            max-width: 130px;
+        }
+        .pickup-card {
+            padding: 10px;
+        }
+        .pickup-card-top {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .pickup-card .btn-primary {
+            width: 100%;
+            margin-top: 8px;
+        }
+        .quick-nav {
+            position: sticky;
+            top: 64px;
+            z-index: 12;
+            background: rgba(240, 253, 244, 0.95);
+            border: 1px solid #d1fae5;
+            border-radius: 12px;
+            padding: 8px;
+            backdrop-filter: blur(6px);
+        }
+        .profile-name {
+            display: none;
         }
     }
 </style>
@@ -313,52 +490,65 @@
 
         <div class="sidebar-action">
             <div>
-                <div style="font-size:12px;opacity:0.85;">Status</div>
+                <div style="font-size:12px;opacity:0.85;" data-translate="Status">Status</div>
                 <div class="px-2 py-1 rounded-full text-xs font-semibold {% if collector.is_available %}status-completed{% else %}status-pending{% endif %}" style="display:inline-block;margin-top:2px;">
-                    {% if collector.is_available %}Available{% else %}Unavailable{% endif %}
+                    <span data-translate="{% if collector.is_available %}Available{% else %}Unavailable{% endif %}">{% if collector.is_available %}Available{% else %}Unavailable{% endif %}</span>
                 </div>
             </div>
             <div style="text-align:right;font-size:11px;line-height:1.2;">
-                <div style="opacity:0.8;">Area</div>
+                <div style="opacity:0.8;" data-translate="Area">Area</div>
                 <div>
                     {% if collector.district %}
                         {{ collector.district.name }}, {{ collector.district.province.name }}
                     {% elif collector.user.household_profile and collector.user.household_profile.district %}
                         {{ collector.user.household_profile.district.name }}, {{ collector.user.household_profile.district.province.name }}
                     {% else %}
-                        Not set
+                        <span data-translate="Not set">Not set</span>
                     {% endif %}
                 </div>
             </div>
         </div>
 
         <nav class="sidebar-menu">
+            <div class="sidebar-section-title" data-translate="Navigation">Navigation</div>
             <a href="{{ url('registration:collector_dashboard') }}" class="menu-item {% if current_page == 'dashboard' %}active{% endif %}">
                 <i class="fas fa-home"></i>
-                <span>Dashboard</span>
+                <span data-translate="Dashboard">Dashboard</span>
             </a>
             <a href="{{ url('registration:collector_available') }}" class="menu-item {% if current_page == 'available' %}active{% endif %}">
                 <i class="fas fa-list-alt"></i>
-                <span>Available Pickups</span>
+                <span data-translate="Available Pickups">Available Pickups</span>
             </a>
             <a href="{{ url('registration:collector_assigned') }}" class="menu-item {% if current_page == 'assigned' %}active{% endif %}">
                 <i class="fas fa-tasks"></i>
-                <span>My Assignments</span>
+                <span data-translate="My Assignments">My Assignments</span>
             </a>
             <a href="{{ url('registration:collector_profile') }}" class="menu-item {% if current_page == 'profile' %}active{% endif %}">
                 <i class="fas fa-user"></i>
-                <span>Profile</span>
+                <span data-translate="Profile">Profile</span>
             </a>
         </nav>
+        <div class="sidebar-footer">
+            <a href="{{ url('registration:logout') }}" class="menu-item logout-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span data-translate="Logout">Logout</span>
+            </a>
+        </div>
     </aside>
+    <div class="dashboard-overlay" id="dashboard-overlay"></div>
 
     <!-- Main -->
     <main class="dashboard-main">
         <!-- Header -->
         <header class="dashboard-header">
-            <div>
-                <div style="font-size:18px;font-weight:700;color:#111827;">Collector Dashboard</div>
-                <div style="font-size:13px;color:#6b7280;">Manage your pickup assignments and routes</div>
+            <div class="header-title-wrap">
+                <button class="mobile-menu-btn" id="sidebar-toggle" aria-label="Toggle menu" data-translate-aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div>
+                <div style="font-size:18px;font-weight:700;color:#111827;" data-translate="Collector Dashboard">Collector Dashboard</div>
+                <div style="font-size:13px;color:#6b7280;" data-translate="Manage your pickup assignments and routes">Manage your pickup assignments and routes</div>
+                </div>
             </div>
             <div class="header-profile">
                 <div class="profile-notification">
@@ -378,23 +568,29 @@
                 </div>
                 <div class="profile-dropdown" id="collector-profile-dropdown" style="display:none;">
                     <a href="#profile-section" class="profile-dropdown-item">
-                        <i class="fas fa-user-circle"></i>Profile
+                        <i class="fas fa-user-circle"></i><span data-translate="Profile">Profile</span>
                     </a>
                     <div class="profile-dropdown-item" style="cursor:default;justify-content:space-between;">
-                        <span><i class="fas fa-circle mr-2"></i>Status</span>
+                        <span><i class="fas fa-circle mr-2"></i><span data-translate="Status">Status</span></span>
                         <span class="px-2 py-1 rounded-full text-xs font-semibold {% if collector.is_available %}status-completed{% else %}status-pending{% endif %}">
-                            {% if collector.is_available %}Available{% else %}Unavailable{% endif %}
+                            <span data-translate="{% if collector.is_available %}Available{% else %}Unavailable{% endif %}">{% if collector.is_available %}Available{% else %}Unavailable{% endif %}</span>
                         </span>
                     </div>
-                    <a href="{{ url('registration:logout') }}" class="profile-dropdown-item">
-                        <i class="fas fa-sign-out-alt"></i>Logout
-                    </a>
                 </div>
             </div>
         </header>
 
         <!-- Stats -->
         <div class="dashboard-content">
+            <div class="quick-nav">
+                {% if current_page == 'dashboard' or current_page == 'assigned' %}
+                <a href="#assigned-section" class="quick-nav-link" data-target="assigned-section"><i class="fas fa-tasks"></i><span data-translate="Assigned">Assigned</span></a>
+                {% endif %}
+                {% if current_page == 'dashboard' or current_page == 'available' %}
+                <a href="#available-section" class="quick-nav-link" data-target="available-section"><i class="fas fa-list-alt"></i><span data-translate="Available">Available</span></a>
+                {% endif %}
+                <a href="#profile-section" class="quick-nav-link" data-target="profile-section"><i class="fas fa-user"></i><span data-translate="Profile">Profile</span></a>
+            </div>
             <!-- Map Section -->
             <div class="content-card" style="margin-bottom: 24px;">
                 <div class="card-header">
@@ -417,7 +613,7 @@
                         </div>
                     </div>
                     <div class="stat-card-value">{{ assigned_pickups|length }}</div>
-                    <div class="stat-card-label">Assigned Pickups</div>
+                    <div class="stat-card-label" data-translate="Assigned Pickups">Assigned Pickups</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-card-header">
@@ -426,7 +622,7 @@
                         </div>
                     </div>
                     <div class="stat-card-value">{{ available_pickups|length }}</div>
-                    <div class="stat-card-label">Available Requests</div>
+                    <div class="stat-card-label" data-translate="Available Requests">Available Requests</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-card-header">
@@ -437,7 +633,7 @@
                     <div class="stat-card-value">
                         {{ assigned_pickups|selectattr('status','equalto','Completed')|list|length }}
                     </div>
-                    <div class="stat-card-label">Completed</div>
+                    <div class="stat-card-label" data-translate="Completed">Completed</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-card-header">
@@ -448,7 +644,7 @@
                     <div class="stat-card-value">
                         {{ assigned_pickups|selectattr('status','equalto','In Progress')|list|length }}
                     </div>
-                    <div class="stat-card-label">In Progress</div>
+                    <div class="stat-card-label" data-translate="In Progress">In Progress</div>
                 </div>
             </div>
 
@@ -458,18 +654,18 @@
                 <!-- Left: Assigned pickups -->
                 <div class="content-card" id="assigned-section">
                     <div class="card-header">
-                        <h2 class="card-title">My Assigned Pickups</h2>
+                        <h2 class="card-title" data-translate="My Assigned Pickups">My Assigned Pickups</h2>
                     </div>
                     {% if assigned_pickups %}
                     <div class="table-container">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Category</th>
-                                    <th>Quantity</th>
-                                    <th>Address</th>
-                                    <th>Status</th>
+                                    <th data-translate="ID">ID</th>
+                                    <th data-translate="Category">Category</th>
+                                    <th data-translate="Quantity">Quantity</th>
+                                    <th data-translate="Address">Address</th>
+                                    <th data-translate="Status">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -478,7 +674,7 @@
                                     <td>#{{ pickup.id }}</td>
                                     <td>{{ pickup.waste_category|waste_category_badge|safe }}</td>
                                     <td>{{ pickup.quantity }} kg</td>
-                                    <td>{{ pickup.address }}</td>
+                                    <td class="address-cell" title="{{ pickup.address }}">{{ pickup.address }}</td>
                                     <td>
                                         <span class="status-badge
                                             {% if pickup.status == 'Completed' %}status-completed
@@ -497,7 +693,7 @@
                         <div class="empty-state-icon">
                             <i class="fas fa-clipboard-list"></i>
                         </div>
-                        <p class="empty-state-text">No assigned pickups yet.</p>
+                        <p class="empty-state-text" data-translate="No assigned pickups yet.">No assigned pickups yet.</p>
                     </div>
                     {% endif %}
                 </div>
@@ -509,18 +705,18 @@
                     <!-- Available pickups -->
                     <div class="content-card" id="available-section">
                         <div class="card-header">
-                            <h2 class="card-title">Available Pickups</h2>
+                            <h2 class="card-title" data-translate="Available Pickups">Available Pickups</h2>
                         </div>
                         {% if available_pickups %}
                         <div style="display:flex;flex-direction:column;gap:12px;">
                             {% for pickup in available_pickups %}
-                            <div style="border-radius:12px;border:1px solid #e5e7eb;padding:12px;background:#f9fafb;">
-                                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+                            <div class="pickup-card">
+                                <div class="pickup-card-top">
                                     <div style="flex:1;">
-                                        <div style="font-weight:600;color:#111827;font-size:14px;margin-bottom:4px;">
-                                            Request #{{ pickup.id }}
+                                        <div class="pickup-card-title">
+                                            <span data-translate="Request">Request</span> #{{ pickup.id }}
                                         </div>
-                                        <div style="font-size:13px;color:#4b5563;">
+                                        <div class="pickup-card-meta">
                                             <div>{{ pickup.waste_category|waste_category_badge|safe }}</div>
                                             <div><i class="fas fa-weight mr-1"></i>{{ pickup.quantity }} kg</div>
                                             <div><i class="fas fa-map-marker-alt mr-1"></i>{{ pickup.address }}</div>
@@ -529,7 +725,7 @@
                                     <form method="post" action="{{ url('registration:assign_pickup', pickup.id) }}">
                                         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                                         <button type="submit" class="btn-primary" style="font-size:12px;padding:6px 10px;">
-                                            <i class="fas fa-hand-paper mr-1"></i>Assign to me
+                                            <i class="fas fa-hand-paper mr-1"></i><span data-translate="Assign to me">Assign to me</span>
                                         </button>
                                     </form>
                                 </div>
@@ -541,7 +737,7 @@
                             <div class="empty-state-icon">
                                 <i class="fas fa-inbox"></i>
                             </div>
-                            <p class="empty-state-text">No available pickups right now.</p>
+                            <p class="empty-state-text" data-translate="No available pickups right now.">No available pickups right now.</p>
                         </div>
                         {% endif %}
                     </div>
@@ -551,7 +747,7 @@
                     <!-- Notifications -->
                     <div class="content-card">
                         <div class="card-header">
-                            <h2 class="card-title">Notifications</h2>
+                            <h2 class="card-title" data-translate="Notifications">Notifications</h2>
                         </div>
                         {% if notifications %}
                         <div style="display:flex;flex-direction:column;gap:10px;">
@@ -571,7 +767,7 @@
                                 <div class="empty-state-icon">
                                     <i class="fas fa-bell-slash"></i>
                                 </div>
-                                <p class="empty-state-text">No new notifications</p>
+                                <p class="empty-state-text" data-translate="No new notifications">No new notifications</p>
                             </div>
                         {% endif %}
                     </div>
@@ -580,42 +776,42 @@
                     <!-- Profile -->
                     <div class="content-card" id="profile-section">
                         <div class="card-header">
-                            <h2 class="card-title">Profile</h2>
+                            <h2 class="card-title" data-translate="Profile">Profile</h2>
                         </div>
                         <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;font-size:13px;">
                             <div>
-                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;">Name</div>
+                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;" data-translate="Name">Name</div>
                                 <div style="color:#111827;">
                                     {% if collector.user.first_name %}{{ collector.user.first_name }} {{ collector.user.last_name }}{% else %}{{ collector.user.username }}{% endif %}
                                 </div>
                             </div>
                             <div>
-                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;">Email</div>
+                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;" data-translate="Email">Email</div>
                                 <div style="color:#111827;">{{ collector.user.email }}</div>
                             </div>
                             <div>
-                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;">Phone</div>
+                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;" data-translate="Phone">Phone</div>
                                 <div style="color:#111827;">{{ collector.phone_number }}</div>
                             </div>
                             <div>
-                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;">License Number</div>
+                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;" data-translate="License Number">License Number</div>
                                 <div style="color:#111827;">
-                                    {% if collector.license_number %}{{ collector.license_number }}{% else %}Not provided{% endif %}
+                                    {% if collector.license_number %}{{ collector.license_number }}{% else %}<span data-translate="Not provided">Not provided</span>{% endif %}
                                 </div>
                             </div>
                             <div>
-                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;">Vehicle Number</div>
+                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;" data-translate="Vehicle Number">Vehicle Number</div>
                                 <div style="color:#111827;">
-                                    {% if collector.vehicle_number %}{{ collector.vehicle_number }}{% else %}Not provided{% endif %}
+                                    {% if collector.vehicle_number %}{{ collector.vehicle_number }}{% else %}<span data-translate="Not provided">Not provided</span>{% endif %}
                                 </div>
                             </div>
                             <div>
-                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;">Verification</div>
+                                <div style="font-weight:600;color:#6b7280;margin-bottom:2px;" data-translate="Verification">Verification</div>
                                 <div>
                                     {% if collector.is_verified %}
-                                    <span class="status-badge status-completed">Verified</span>
+                                    <span class="status-badge status-completed" data-translate="Verified">Verified</span>
                                     {% else %}
-                                    <span class="status-badge status-pending">Pending</span>
+                                    <span class="status-badge status-pending" data-translate="Pending">Pending</span>
                                     {% endif %}
                                 </div>
                             </div>
@@ -631,6 +827,72 @@
     document.addEventListener('DOMContentLoaded', function () {
         const profileToggle = document.getElementById('collector-profile-toggle');
         const profileDropdown = document.getElementById('collector-profile-dropdown');
+        const sidebar = document.querySelector('.dashboard-sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebarOverlay = document.getElementById('dashboard-overlay');
+        const quickLinks = Array.from(document.querySelectorAll('.quick-nav-link[data-target]'));
+
+        function closeSidebar() {
+            if (sidebar) {
+                sidebar.classList.remove('open');
+            }
+            if (sidebarOverlay) {
+                sidebarOverlay.classList.remove('active');
+            }
+        }
+
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', function () {
+                sidebar.classList.toggle('open');
+                if (sidebarOverlay) {
+                    sidebarOverlay.classList.toggle('active');
+                }
+            });
+        }
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeSidebar);
+        }
+
+        document.querySelectorAll('.sidebar-menu .menu-item, .sidebar-footer .menu-item').forEach(function (link) {
+            link.addEventListener('click', closeSidebar);
+        });
+
+        if (quickLinks.length) {
+            function setQuickActive(id) {
+                quickLinks.forEach(function (link) {
+                    link.classList.toggle('active', link.dataset.target === id);
+                });
+            }
+
+            quickLinks.forEach(function (link) {
+                link.addEventListener('click', function () {
+                    setQuickActive(link.dataset.target);
+                });
+            });
+
+            const observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        setQuickActive(entry.target.id);
+                    }
+                });
+            }, { threshold: 0.45, rootMargin: '-80px 0px -30% 0px' });
+
+            quickLinks.forEach(function (link) {
+                const section = document.getElementById(link.dataset.target);
+                if (section) {
+                    observer.observe(section);
+                }
+            });
+
+            const firstVisibleTarget = quickLinks.find(function (link) {
+                return document.getElementById(link.dataset.target);
+            });
+            if (firstVisibleTarget) {
+                setQuickActive(firstVisibleTarget.dataset.target);
+            }
+        }
 
         if (profileToggle && profileDropdown) {
             profileToggle.addEventListener('click', function (e) {
@@ -670,7 +932,7 @@
                             collectorMap, 
                             location.lat, 
                             location.lon, 
-                            'Your Location', 
+                            (window.TranslationManager ? window.TranslationManager.translate('Your Location') : 'Your Location'), 
                             '#059669'
                         );
                         
@@ -703,7 +965,7 @@
                                 collectorMap,
                                 pickup.latitude,
                                 pickup.longitude,
-                                `${pickup.waste_category} - ${pickup.quantity}kg - ${pickup.distance_km}km away`,
+                                `${pickup.waste_category} - ${pickup.quantity}kg - ${pickup.distance_km}${window.TranslationManager ? ' ' + window.TranslationManager.translate('km away') : ' km away'}`,
                                 '#d97706'
                             );
                             pickupMarkers.push(marker);
@@ -712,15 +974,15 @@
                             const item = document.createElement('div');
                             item.style.cssText = 'padding: 12px; margin-bottom: 8px; background: white; border-radius: 6px; border-left: 3px solid #d97706;';
                             item.innerHTML = `
-                                <div style="font-weight: 600; color: #111827;">Pickup #${pickup.id} - ${pickup.waste_category}</div>
+                                <div style="font-weight: 600; color: #111827;">${window.TranslationManager ? window.TranslationManager.translate('Pickup') : 'Pickup'} #${pickup.id} - ${pickup.waste_category}</div>
                                 <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
                                     <i class="fas fa-user"></i> ${pickup.household_name} | 
                                     <i class="fas fa-weight"></i> ${pickup.quantity} kg | 
-                                    <i class="fas fa-map-marker-alt"></i> ${pickup.distance_km} km away
+                                    <i class="fas fa-map-marker-alt"></i> ${pickup.distance_km} ${window.TranslationManager ? window.TranslationManager.translate('km away') : 'km away'}
                                 </div>
                                 <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">${pickup.address}</div>
                                 <a href="/pickup/${pickup.id}/assign/" class="btn-primary" style="margin-top: 8px; padding: 6px 12px; font-size: 12px; display: inline-block;">
-                                    <i class="fas fa-check"></i> Assign to Me
+                                    <i class="fas fa-check"></i> ${window.TranslationManager ? window.TranslationManager.translate('Assign to me') : 'Assign to me'}
                                 </a>
                             `;
                             pickupsList.appendChild(item);

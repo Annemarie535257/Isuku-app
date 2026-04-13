@@ -10,10 +10,11 @@ function initMap(mapId, options = {}) {
     
     const map = L.map(mapId).setView([defaultLat, defaultLon], zoom);
     
-    // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 19
+    // Use CARTO basemaps to avoid OSM volunteer tile blocking in some environments
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        subdomains: 'abcd',
+        attribution: '© OpenStreetMap contributors © CARTO',
+        maxZoom: 20
     }).addTo(map);
     
     return map;
