@@ -1,9 +1,9 @@
-import React from "react";
+import { Component, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 
-class AppErrorBoundary extends React.Component {
+class AppErrorBoundary extends Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false, errorMessage: "" };
@@ -59,9 +59,9 @@ window.addEventListener("unhandledrejection", (event) => {
 });
 
 createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
+  <StrictMode>
     <AppErrorBoundary>
       <App />
     </AppErrorBoundary>
-  </React.StrictMode>
+  </StrictMode>
 );
